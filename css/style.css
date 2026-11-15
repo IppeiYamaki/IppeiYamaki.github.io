@@ -191,6 +191,7 @@ section[id] {
 
 .profile-photo {
   width: 100%;
+  height: auto;
   aspect-ratio: 3 / 4;
   object-fit: cover;
   border-radius: var(--radius);
@@ -321,6 +322,15 @@ section[id] {
   padding: 10px 14px;
   border-bottom: 1px solid var(--border);
   vertical-align: top;
+}
+
+.info-table td {
+  overflow-wrap: anywhere;
+}
+
+/* なるべく途中で折り返さないまとまり */
+.keep {
+  display: inline-block;
 }
 
 .info-table th {

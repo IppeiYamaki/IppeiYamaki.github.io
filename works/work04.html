@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>作品名（仮） | 山木一平</title>
-  <meta name="description" content="作品説明（仮）">
+  <title>こたつでみかん | 山木一平</title>
+  <meta name="description" content="HAL東京のゲームジャムでチームで作った2Dのゲーム「こたつでみかん」のうち、担当したプログラムを紹介します。">
   <link rel="stylesheet" href="../css/style.css?v=20261116-3">
 </head>
 <body>
@@ -24,13 +24,13 @@
 
     <section class="work-header">
       <div class="container">
-        <h1>作品名（仮）</h1>
+        <h1>こたつでみかん</h1>
         <ul class="tags">
           <li>Unity</li>
           <li>C#</li>
         </ul>
         <div class="video placeholder">動画（仮）</div>
-        <p>作品説明（仮）</p>
+        <p>こたつに入った女の子のもとへ飛んでくる、みかん・腐ったみかん・お年玉を、とっさに「掴んで食べる」か「弾く」かを選ぶ2Dのゲームです。HAL東京のゲームジャム「Tokyo Game Survival Winter 2026」でチームで作り、ゲーム画面のプログラムと、GitHubのリポジトリの管理を担当しました。</p>
       </div>
     </section>
 
@@ -38,11 +38,8 @@
       <div class="container">
         <h2 class="section-title">概要</h2>
         <table class="info-table">
-          <tr><th>制作期間</th><td>（仮）</td></tr>
-          <tr><th>制作人数</th><td>（仮）</td></tr>
-          <tr><th>担当</th><td>（仮）</td></tr>
-          <tr><th>開発環境</th><td>（仮）</td></tr>
-          <tr><th>リンク</th><td><a href="#">GitHub（仮）</a></td></tr>
+          <tr><th>担当</th><td>ゲーム画面のプログラム（ゲームの進行、アイテムの出現・判定・動き、女の子の表情と動き、UI）<br>GitHubのリポジトリの管理</td></tr>
+          <tr><th>開発環境</th><td>Unity 6（URP 2D）、C#、GitHub</td></tr>
         </table>
       </div>
     </section>
@@ -52,18 +49,19 @@
         <h2 class="section-title">技術の見どころ</h2>
 
         <div class="feature">
-          <h3>見どころ（仮）</h3>
-          <p>説明（仮）</p>
+          <h3>アイテムのルールをデータで決める</h3>
+          <p>みかん・腐ったみかん・お年玉の違いは、プログラムではなくScriptableObjectのデータで決めています。アイテムごとに、絵と出やすさ（重み）を持たせました。さらに「掴む・食べる・弾く・見逃す」の4つの行動それぞれに、結果（点数の増減、ハートが減るか、コンボが切れるか、女の子の表情）を持たせています。ゲームの処理は、起きた行動に合う結果を取り出して反映するだけです。アイテムを増やすときや、点数と出やすさを調整するときは、プログラムを変えずにInspectorでデータを直すだけで済むようにしました。</p>
         </div>
 
         <div class="feature">
-          <h3>見どころ（仮）</h3>
-          <p>説明（仮）</p>
+          <h3>山なりの動きを1つの部品で</h3>
+          <p>飛んでくる・弾かれる・見逃して落ちる、というアイテムの動きは、物理演算を使わず、経過時間から位置を計算する1つの部品でまとめて動かしています。始点から終点へ進む割合と、山なりの高さ（4t(1−t)）を別々に計算するので、弧の高さと速さの緩急を別々に調整できます。速さの緩急は、等速と、Sine・Back・Bounceなど30種類のイージングから、Inspectorで選べます。着いたら知らせる仕組みにして、着いたあとの処理はアイテムの側に任せています。</p>
+          <p class="note">イージングの式は<a href="https://easings.net/" target="_blank" rel="noopener">easings.net</a>のものを使っています。</p>
         </div>
 
         <div class="feature">
-          <h3>見どころ（仮）</h3>
-          <p>説明（仮）</p>
+          <h3>受け付けの判定とアイテムの流れ</h3>
+          <p>アイテムは「こたつへ向かう → 掴まれる・弾かれる・見逃される → 消える」という状態を持っています。キーを受け付けるのは、判定の位置から一定の距離に入っている間だけです。掴んだときは少し間を置いてから自動で食べるので、「掴んだ瞬間」と「食べた瞬間」で結果を分けられます（お年玉は掴んだ瞬間に点が入り、腐ったみかんは食べた瞬間にハートが減ります）。結果はゲームの進行を受け持つ部品にまとめて渡し、点数・コンボ・ハートの更新と、女の子の表情・手の絵の切り替え、効果音の再生を1か所で行います。ハートがなくなったら、アイテムごとの行動の回数を集計して、リザルトの画面へ渡します。</p>
         </div>
       </div>
     </section>
@@ -72,8 +70,8 @@
       <div class="container">
         <h2 class="section-title">苦労した点</h2>
         <div class="feature">
-          <h3>苦労した点（仮）</h3>
-          <p>説明（仮）</p>
+          <h3>短い時間でチームの作業をぶつけない</h3>
+          <p>時間の短いゲームジャムなので、作業のぶつかりを直すのに時間を取られないよう、最初にGitHubの決まりを作りました。作業はdevelopブランチで行い、mainは管理者だけが変えます。スクリプトや素材はAssetsの下の自分の名前のフォルダに置き、ほかの人のフォルダは直接変えません。この形にして、Unityのファイルがぶつかるのを減らすようにしました。</p>
         </div>
       </div>
     </section>

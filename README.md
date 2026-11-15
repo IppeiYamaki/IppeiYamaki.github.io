@@ -16,9 +16,9 @@ https://ippeiyamaki.github.io/
 
 ## 作品一覧
 
-### 1. 作品名（仮）
-- **技術**: C++, DirectX12
-- **特徴**: 作品説明（仮）
+### 1. DirectX12 フレームワーク
+- **技術**: C++, DirectX12, HLSL
+- **特徴**: C++20 と DirectX12 で作った自作のゲームフレームワーク。自作の DirectX11 フレームワークを元に描画の層を作り直し、DXR のレイトレーシング（RayQuery の影、AO）、メッシュシェーダー、PBR、MSAA、Bindless、複数スレッドでのコマンドの記録、エディターなど
 
 ### 2. DirectX11 フレームワーク
 - **技術**: C++, DirectX11, HLSL

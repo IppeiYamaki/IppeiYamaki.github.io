@@ -179,12 +179,6 @@ main [id]:not(section) {
   border-radius: var(--radius);
 }
 
-.profile-name {
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin: 0;
-}
-
 /* ---- タグ ---- */
 
 .tags {

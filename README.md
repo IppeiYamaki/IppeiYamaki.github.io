@@ -44,13 +44,15 @@ IppeiYamaki.github.io/
 │   └── work04.html
 ├── css/
 │   └── style.css       # スタイル
+├── js/
+│   └── main.js         # 画像の拡大表示
 ├── images/             # 画像ファイル
 └── README.md           # このファイル
 ```
 
 ## 技術スタック
 
-- HTML / CSS（ライブラリ・フレームワークは不使用）
+- HTML / CSS / JavaScript（ライブラリ・フレームワークは不使用）
 - GitHub Pages
 
 ## 連絡先

@@ -531,6 +531,42 @@ pre {
   overflow-wrap: anywhere;
 }
 
+/* 押すと大きく見られる画像 */
+.zoomable {
+  cursor: zoom-in;
+}
+
+.viewer {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  cursor: zoom-out;
+}
+
+.viewer::backdrop {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.viewer img {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  max-width: calc(100% - 32px);
+  max-height: calc(100% - 32px);
+  background: #fff;
+}
+
+/* 開いている間は、後ろのページを動かさない */
+html:has(.viewer[open]) {
+  overflow: hidden;
+}
+
 /* ---- フッター ---- */
 
 .site-footer {

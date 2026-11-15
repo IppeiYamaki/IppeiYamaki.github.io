@@ -31,7 +31,9 @@
           <li>HLSL</li>
           <li>DXR</li>
         </ul>
-        <div class="video placeholder">動画（仮）</div>
+        <div class="video">
+          <img src="../images/work01/header.jpg" alt="柱の並ぶ広場に、金属や粗さの違う球、格子の箱、光る柱、黒い輪の中の銅の球などを並べた場面" width="1280" height="720">
+        </div>
         <p>C++20 と DirectX12 で作った、ゲーム作りのための自作のフレームワークです。自作の DirectX11 フレームワークを元に描画の層を Direct3D 12 で作り直し、DXR のレイトレーシング（影と AO）、メッシュシェーダー、PBR、Bindless、複数スレッドでのコマンドの記録と、ゲームを作るためのエディターを作りました。</p>
 
         <nav class="toc" aria-label="目次">
@@ -121,10 +123,6 @@
             <li>SpritePass: 画面の UI と文字を描く</li>
             <li>ImGuiPass: エディターの窓を描く（Debug 構成だけ）</li>
           </ol>
-          <figure class="figure medium">
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>途中の的（影の絵、場面の色と深度、AO、ブルームの段）を並べて見る窓</figcaption>
-          </figure>
         </div>
       </div>
     </section>
@@ -180,16 +178,10 @@ Texture2D GetNormalTexture() { return ResourceDescriptorHeap[g_normalTextureInde
             <li>記録の重い Debug 構成（GPU ベースの検証あり）では、メインスレッドの記録が 2.5 ms から 1.8 ms に減った</li>
             <li>計算のキューと重ねることで、レイの影と AO を使う場面の GPU の時間が 0.3〜0.45 ms 短くなった</li>
           </ul>
-          <div class="compare">
-            <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>描画の時間（複数スレッドの記録なし）</figcaption>
-            </figure>
-            <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>描画の時間（複数スレッドの記録あり）</figcaption>
-            </figure>
-          </div>
+          <figure class="figure">
+            <img src="../images/work01/recording.jpg" alt="広い床の上に、赤い箱と青い円柱と金属の球が、何列も並んでいる場面" width="1280" height="720" loading="lazy">
+            <figcaption>赤い箱、青い円柱、金属の球をたくさん並べ、コマンドの記録を重くした場面</figcaption>
+          </figure>
         </div>
       </div>
     </section>
@@ -210,12 +202,12 @@ Texture2D GetNormalTexture() { return ResourceDescriptorHeap[g_normalTextureInde
           </ul>
           <div class="compare">
             <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>シャドウマップ</figcaption>
+              <img src="../images/work01/rt-shadow-map.jpg" alt="格子の箱と柵と葉の影が、ぼやけた縁で床に落ちている場面" width="960" height="540" loading="lazy">
+              <figcaption>シャドウマップ。影の縁がぼやける</figcaption>
             </figure>
             <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>レイトレーシングの影</figcaption>
+              <img src="../images/work01/rt-shadow-ray.jpg" alt="同じ場面で、格子の箱と柵と葉の影が、くっきりした形で床に落ちている" width="960" height="540" loading="lazy">
+              <figcaption>レイトレーシングの影。葉の形までくっきり落ちる</figcaption>
             </figure>
           </div>
 <pre><code>RayDesc ray;
@@ -253,12 +245,12 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
           </ul>
           <div class="compare">
             <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
+              <img src="../images/work01/ao-off.jpg" alt="部屋の隅に箱を積み、赤い球と柱を置いた場面を、AO なしで描いたもの" width="960" height="540" loading="lazy">
               <figcaption>AO なし</figcaption>
             </figure>
             <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>AO あり</figcaption>
+              <img src="../images/work01/ao-on.jpg" alt="同じ場面を AO ありで描き、壁の隅と箱の接する所が暗くなったもの" width="960" height="540" loading="lazy">
+              <figcaption>AO あり。壁の隅と、物が接する所が暗くなる</figcaption>
             </figure>
           </div>
         </div>
@@ -273,10 +265,16 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>頂点シェーダーの版と、ビット単位で同じ絵になることを確かめた</li>
             <li>メッシュシェーダーに対応しない GPU では、頂点シェーダーの版で描く</li>
           </ul>
-          <figure class="figure medium">
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>メッシュシェーダーで描いた輪郭線</figcaption>
-          </figure>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/outline-off.jpg" alt="橙のトーラス、緑の円柱、桃色の球、青い箱を、輪郭線なしで描いた場面" width="960" height="540" loading="lazy">
+              <figcaption>輪郭線なし</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/outline-on.jpg" alt="同じ場面で、どの物にも黒い輪郭線が付いたもの" width="960" height="540" loading="lazy">
+              <figcaption>輪郭線あり</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="hdr">
@@ -287,9 +285,9 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>トーンマップの曲線を、切るだけ・肩・S 字の 3 つから選べる</li>
             <li>1 を超える明るさを残したまま、ブルームや AO を掛けられる</li>
           </ul>
-          <figure class="figure medium">
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>トーンマップの曲線の比べ（切るだけ・肩・S 字）</figcaption>
+          <figure class="figure">
+            <img src="../images/work01/hdr.jpg" alt="砂の地面に、光る 3 つの球と白く明るい板、黒い金属の球を置き、球の周りがにじんでいる場面" width="1280" height="720" loading="lazy">
+            <figcaption>発光する球と明るい板を HDR のまま描き、ブルームを掛けて画面に出した場面</figcaption>
           </figure>
         </div>
 
@@ -304,18 +302,24 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
           </ul>
           <div class="compare">
             <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>粗さと金属を変えた球</figcaption>
+              <img src="../images/work01/pbr-spheres.jpg" alt="銅色の球が 5 行 5 列に並び、場所ごとに照り返しの鋭さと色が違う場面" width="960" height="540" loading="lazy">
+              <figcaption>粗さと金属を変えた球。左ほど滑らかで、上ほど金属</figcaption>
             </figure>
             <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>法線マップの付いた板</figcaption>
+              <img src="../images/work01/pbr-normal-map.jpg" alt="平らな板に、法線マップで丸い出っ張りが並んで見える場面" width="960" height="540" loading="lazy">
+              <figcaption>平らな板に、法線マップで出っ張りを付けたもの</figcaption>
             </figure>
           </div>
-          <figure class="figure medium">
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>材質の値（法線、粗さ、金属）を色で見る表示</figcaption>
-          </figure>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/pbr-view-roughness.jpg" alt="球の並びを粗さの値で塗り、左の列が黒く、右の列ほど白い表示" width="960" height="540" loading="lazy">
+              <figcaption>材質の値を色で見る表示（粗さ）</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/pbr-view-metallic.jpg" alt="球の並びを金属の値で塗り、上の行が白く、下の行ほど暗い表示" width="960" height="540" loading="lazy">
+              <figcaption>材質の値を色で見る表示（金属）</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="msaa">
@@ -329,12 +333,12 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
           </ul>
           <div class="compare">
             <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>MSAA なし</figcaption>
+              <img src="../images/work01/msaa-off.png" alt="格子の箱の縁と穴の縁が、階段のようにぎざぎざに見える拡大図" width="640" height="360" loading="lazy">
+              <figcaption>MSAA なし（2 倍に拡大）</figcaption>
             </figure>
             <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>MSAA 4x</figcaption>
+              <img src="../images/work01/msaa-on.png" alt="同じ所を MSAA で描き、縁がなめらかになった拡大図" width="640" height="360" loading="lazy">
+              <figcaption>MSAA あり（2 倍に拡大）</figcaption>
             </figure>
           </div>
         </div>
@@ -349,9 +353,9 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>Direct3D 11 のようにパスの終わりで状態を戻さず、パスごとに要る状態を置く</li>
             <li>粒と UI の頂点や、文字のアトラスへの書き込みは、アップロード用のリングバッファから切り出す</li>
           </ul>
-          <figure class="figure medium">
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>影、ブルーム、粒、トゥーン、文字を Direct3D 12 で描いた場面</figcaption>
+          <figure class="figure">
+            <img src="../images/work01/dx11-features.jpg" alt="柱の並ぶ道に長い影が落ち、柱の上の灯りがにじみ、火鉢から火の粉と煙が上がり、輪郭線の付いた輪と、体力の帯や日本語の字の UI がある場面" width="1280" height="720" loading="lazy">
+            <figcaption>影、ブルーム、火の粒と煙、輪郭線、画面の UI と日本語の字を、Direct3D 12 で描いた場面</figcaption>
           </figure>
         </div>
       </div>
@@ -370,9 +374,9 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>Debug 構成では、標準とゲームのシェーダーを F5 でまとめて読み直せる</li>
             <li>見本として、縁を光らせながら物を溶かして戻すディゾルブのシェーダーを作った</li>
           </ul>
-          <figure class="figure medium">
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>ゲーム側のシェーダーで描いたディゾルブ</figcaption>
+          <figure class="figure">
+            <img src="../images/work01/dissolve.jpg" alt="青白く光る輪が、橙色に光る縁を残しながら溶けて消えていく場面" width="1280" height="720" loading="lazy">
+            <figcaption>縁を光らせながら溶けていく輪（ゲーム側のシェーダー）</figcaption>
           </figure>
         </div>
 
@@ -388,12 +392,12 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
           </ul>
           <div class="compare">
             <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>glTF のモデル</figcaption>
+              <img src="../images/work01/gltf.jpg" alt="台の上に、市松模様の箱、金属の球を並べた箱、格子の板を置いた場面" width="960" height="540" loading="lazy">
+              <figcaption>glTF で読み込んだモデル</figcaption>
             </figure>
             <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>読み込み中の画面</figcaption>
+              <img src="../images/work01/loading.jpg" alt="暗い画面の真ん中に「読み込み中」の字と進み具合の帯がある画面" width="960" height="540" loading="lazy">
+              <figcaption>裏で読み込んでいる間の画面</figcaption>
             </figure>
           </div>
         </div>
@@ -410,16 +414,6 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>シェーダーの読み直し: F5 で、すべてのシェーダーをコンパイルでき、C++ の側と食い違わないときだけ入れ替える。古い PSO は GPU が使い終わってから手放す</li>
             <li>パスごとの GPU のマーカー（RenderDoc でパスの名前が並ぶ）、デバッグレイヤーの文をログに出す仕組み、デバイスが落ちたときの DRED の記録</li>
           </ul>
-          <div class="compare">
-            <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>エディターの全体</figcaption>
-            </figure>
-            <figure class="figure">
-              <div class="thumb placeholder">画像（仮）</div>
-              <figcaption>Scene の窓で物を選んだところ</figcaption>
-            </figure>
-          </div>
         </div>
 
         <div class="feature" id="others">
@@ -432,26 +426,6 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>音: WAV に加えて、MP3・FLAC・M4A・WMA を Media Foundation で読む。MP3 は頭と終わりの無音を切り、つなぎ目なくループする</li>
             <li>配布: Release の実行ファイルと要る資産だけを zip にまとめるスクリプト。DLL を使わずに動く</li>
           </ul>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="container">
-        <h2 class="section-title">スクリーンショット</h2>
-        <div class="gallery">
-          <figure>
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>説明（仮）</figcaption>
-          </figure>
-          <figure>
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>説明（仮）</figcaption>
-          </figure>
-          <figure>
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>説明（仮）</figcaption>
-          </figure>
         </div>
 
         <a class="back-link" href="../#works">← 作品一覧に戻る</a>

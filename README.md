@@ -25,6 +25,10 @@ https://ippeiyamaki.github.io/
 - **特徴**: 作品説明（仮）
 
 ### 3. 作品名（仮）
+- **技術**: C++, DirectX12
+- **特徴**: 作品説明（仮）
+
+### 4. 作品名（仮）
 - **技術**: Unity, C#
 - **特徴**: 作品説明（仮）
 
@@ -36,7 +40,8 @@ IppeiYamaki.github.io/
 ├── works/              # 作品ページ
 │   ├── work01.html
 │   ├── work02.html
-│   └── work03.html
+│   ├── work03.html
+│   └── work04.html
 ├── css/
 │   └── style.css       # スタイル
 ├── images/             # 画像ファイル

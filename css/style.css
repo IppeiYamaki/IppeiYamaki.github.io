@@ -281,6 +281,7 @@ main [id]:not(section) {
 
 .skills {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
 }
 
@@ -288,41 +289,18 @@ main [id]:not(section) {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 16px 20px;
+  padding: 16px;
 }
 
 .skill-box h3 {
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   font-size: 1rem;
-  color: var(--accent);
 }
 
-/* 名前と、それで何をしたか */
-.skill-list {
-  display: grid;
-  grid-template-columns: 9em 1fr;
-  gap: 8px 16px;
+.skill-box ul {
   margin: 0;
-}
-
-.skill-list dt {
-  font-weight: 700;
-}
-
-.skill-list dd {
-  margin: 0;
+  padding-left: 1.2em;
   color: var(--muted);
-}
-
-@media (max-width: 600px) {
-  .skill-list {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
-  .skill-list dd + dt {
-    margin-top: 12px;
-  }
 }
 
 /* ---- 表 ---- */

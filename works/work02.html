@@ -32,7 +32,9 @@
           <li>PMX / VMD</li>
           <li>Jolt Physics</li>
         </ul>
-        <div class="video placeholder">動画（仮）</div>
+        <div class="video">
+          <img src="../images/work02/header.jpg" alt="夜の広場で、色の違う点光源と、発光する輪や箱が光っている場面" width="1280" height="720">
+        </div>
         <p>C++20 と DirectX11 で作った、ゲーム作りのための自作のフレームワークです。コードで GameObject と Component を組んでゲームを作る形にし、MMD のキャラクターの表示とアニメーション、影やポストエフェクトなどの描画、物理、画面の UI と文字、開発を助けるデバッグの道具を作りました。</p>
 
         <nav class="toc" aria-label="目次">
@@ -166,6 +168,10 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>骨とモーフで動く PMX のモデルは、動いた形の影を落とす</li>
             <li>デバッグの窓で、段ごとに色を付けて範囲を確かめられる</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work02/shadow.jpg" alt="奥へ続く柱の回廊に、柱と球と輪の影が長く落ちている場面" width="1280" height="673" loading="lazy">
+            <figcaption>奥へ 60 m 続く柱の回廊。手前から奥まで影が落ちる</figcaption>
+          </figure>
         </div>
 
         <div class="feature" id="lighting">
@@ -177,6 +183,20 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>リム: 視線と面の向き（N·V）から、輪郭に近い所を光らせる</li>
             <li>発光: Material ごとの強さとマスクで光らせ、ブルームでにじませる</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work02/lighting.jpg" alt="夜の広場で、色の違う点光源とスポットが床を照らし、3 つの球に反射が付き、箱と輪が発光している場面" width="1280" height="673" loading="lazy">
+            <figcaption>色の違う点光源 6 つとスポット 3 つ、反射とリムを付けた 3 つの球、発光する箱と輪</figcaption>
+          </figure>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work02/lighting-plain.jpg" alt="点光源とスポットを消した、暗い球の並び" width="960" height="517" loading="lazy">
+              <figcaption>点光源とスポットを消したとき</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work02/lighting-highlight.jpg" alt="点光源とスポットで、球に色の付いた反射が入り、床が照らされた並び" width="960" height="517" loading="lazy">
+              <figcaption>点けたとき。光ごとに反射と床の明かりが足される</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="toon">
@@ -188,6 +208,20 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>押し出す向きに、同じ位置の頂点の法線を平均した向きも選べ、箱の角や円柱の縁でも線が切れない</li>
             <li>PMX の頂点ごとのエッジの倍率で、場所ごとに線の太さを変える</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work02/toon.jpg" alt="前の列に 4 つの球、後ろの列に輪郭線を付けた円柱と立方体が並ぶ場面" width="1280" height="673" loading="lazy">
+            <figcaption>前の列は左から Lit、Toon、加算のスフィア、乗算のスフィアの球。後ろの列は輪郭線を付けた円柱と立方体</figcaption>
+          </figure>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work02/toon-outline-vertex.jpg" alt="角で輪郭線が途切れている立方体" width="520" height="520" loading="lazy">
+              <figcaption>頂点の法線で押し出すと、角で線が割れる</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work02/toon-outline-smooth.jpg" alt="角でも輪郭線がつながっている立方体" width="520" height="520" loading="lazy">
+              <figcaption>平均した法線で押し出すと、線がつながる</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="transparency">
@@ -198,6 +232,16 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>両面: Material ごとに裏の面も描ける</li>
             <li>テクスチャに透ける画素がある材質は、読み込むときに半透明の描き方にする</li>
           </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work02/transparency-opaque.jpg" alt="格子の衝立と球と箱を、不透明で描いた場面" width="960" height="504" loading="lazy">
+              <figcaption>切り抜きを不透明にしたとき</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work02/transparency-cutout.jpg" alt="格子の衝立と球と箱に穴が開き、影も格子の形になった場面" width="960" height="504" loading="lazy">
+              <figcaption>切り抜き。影も穴の形になる。真ん中は重なったガラスの箱</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="post-effect">
@@ -210,6 +254,16 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>FXAA: 輝度の差で縁を見つけ、縁に沿って読み直して、斜めの縁のぎざぎざを和らげる</li>
             <li>画面の UI と文字、デバッグの表示は効果の後に描くので、にじまない</li>
           </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work02/bloom-off.jpg" alt="暗い部屋の光る輪と床の光を、ブルームなしで描いた場面" width="960" height="504" loading="lazy">
+              <figcaption>ブルームなし</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work02/bloom-on.jpg" alt="光る輪と床の光の周りが、ブルームでにじんだ場面" width="960" height="504" loading="lazy">
+              <figcaption>ブルームあり</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="sky">
@@ -219,6 +273,20 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>物が描かれていない画素だけを塗るので、物の後ろの画素は計算しない</li>
             <li>太陽の位置は平行光源の向きから決まり、光を回すと空の色も変わる</li>
           </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work02/sky-day.jpg" alt="青い空の下の平原に、立石と球と輪が並ぶ昼の場面" width="960" height="504" loading="lazy">
+              <figcaption>昼</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work02/sky-evening.jpg" alt="橙色の夕焼けの空の前で、立石が影絵になった場面" width="960" height="504" loading="lazy">
+              <figcaption>夕方。太陽が正面の空に入り、立石が影絵になる</figcaption>
+            </figure>
+          </div>
+          <figure class="figure medium">
+            <img src="../images/work02/sky-morning.jpg" alt="明るい朝の空に太陽が見え、立石の影が手前へ伸びる場面" width="1280" height="673" loading="lazy">
+            <figcaption>朝</figcaption>
+          </figure>
         </div>
 
         <div class="feature" id="particle">
@@ -230,6 +298,10 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>粒はワールドの空間に置くので、出した後に出す物を動かしても、粒はその場で動き続ける</li>
             <li>乱数の種を決めれば、同じ動きを何度でも再現できる</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work02/particles.jpg" alt="夜の焚き火から、炎と火花と煙が上がっている場面" width="1280" height="673" loading="lazy">
+            <figcaption>夜の焚き火。炎と火花は加算、煙はアルファで描く</figcaption>
+          </figure>
         </div>
 
         <div class="feature" id="ui-text">
@@ -241,6 +313,10 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>字は、Windows の字体を DirectWrite で開き、使う字だけを SDF にしてアトラスに入れる（日本語も出る）</li>
             <li>行送り、揃え、折り返し、簡単な禁則で並べ、縁取りを付けて描く</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work02/ui-text.jpg" alt="野原の場面に、題名、体力のゲージ、アイコン、ボタン、会話の窓を重ねた画面" width="1280" height="673" loading="lazy">
+            <figcaption>縁取りの題名、状態の板とゲージ、アイコン、ボタン、会話の窓（折り返しと禁則）</figcaption>
+          </figure>
         </div>
       </div>
     </section>
@@ -248,6 +324,7 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
     <section id="mmd">
       <div class="container">
         <h2 class="section-title">MMD のキャラクター</h2>
+        <p>写っているキャラクターは、Mixamo の X Bot と、VRoid のサンプルモデル（CC0）を PMX に変換した物です。モーションの一部も、Mixamo のアニメーションを変換して使っています。</p>
 
         <div class="feature" id="pmx">
           <h3>PMX の読み込み</h3>
@@ -257,6 +334,10 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>テクスチャのパスは、サブフォルダや日本語の名前も読める</li>
             <li>壊れた節のあるファイルも、読める所までで表示する</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work02/pmx.jpg" alt="制服を着た女の子のキャラクターの胸から上を、正面から描いた場面" width="1280" height="673" loading="lazy">
+            <figcaption>VRoid のサンプルモデルを PMX に変換して読み込んだ物</figcaption>
+          </figure>
         </div>
 
         <div class="feature" id="skinning">
@@ -267,6 +348,16 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>IK: 足の IK などを CCD で解く。ひざは 1 つの軸の角度の制限で曲げる</li>
             <li>骨とモーフで動いた形には、輪郭線と影も付いてくる</li>
           </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work02/ik-stand.jpg" alt="丸い舞台の上にまっすぐ立つ人型のモデル" width="640" height="720" loading="lazy">
+              <figcaption>立ち姿</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work02/ik-foot.jpg" alt="片足を箱の上に乗せ、ひざを曲げた人型のモデル" width="640" height="720" loading="lazy">
+              <figcaption>足を台に乗せると、足の IK でひざが曲がる</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="morph">
@@ -277,6 +368,10 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>重みが変わったフレームだけ差分を作り直して GPU に写す</li>
             <li>材質モーフは、色などを足す形と掛ける形に対応</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work02/morph.jpg" alt="同じキャラクターの顔を、6 つの表情で並べた絵" width="1600" height="260" loading="lazy">
+            <figcaption>左から ふつう、笑顔、怒り、悲しみ、びっくり、ウィンク</figcaption>
+          </figure>
         </div>
 
         <div class="feature" id="motion">
@@ -288,6 +383,10 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>負の速さで逆に再生できる</li>
             <li>2 本のモーションを、決めた秒数で混ぜて切り替える（クロスフェード）</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work02/motion.jpg" alt="走るモーションの途中の姿勢を、4 つ並べた絵" width="1280" height="471" loading="lazy">
+            <figcaption>走るモーションを再生しているところ（4 コマ）</figcaption>
+          </figure>
         </div>
 
         <div class="feature" id="swing">
@@ -299,6 +398,10 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>当たりのグループ（16 のグループとマスク）を、Jolt の層の値に詰めて写す</li>
             <li>モーションを止めている間も、毎フレーム物理を進める</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work02/swing.jpg" alt="首を左右に振るキャラクターの頭を 4 つ並べ、髪が振りに遅れて揺れている絵" width="1280" height="275" loading="lazy">
+            <figcaption>首を振ったときの髪の揺れ（動画から 4 コマ）</figcaption>
+          </figure>
         </div>
       </div>
     </section>
@@ -316,6 +419,10 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>重なりの押し戻しで、箱を積み重ねられる</li>
             <li>問い合わせ: レイを当てて最も近い 1 つを返す、形を重ねて当たる物を集める（球・箱・カプセル）、画面の点（マウス）からのレイを作る</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work02/physics.jpg" alt="囲いの中に箱のピラミッドがあり、斜面から落ちてきた球や箱やカプセルが積もっている場面" width="1280" height="673" loading="lazy">
+            <figcaption>囲いの中の箱のピラミッドと、斜面から落ち続ける球・箱・カプセル</figcaption>
+          </figure>
         </div>
 
         <div class="feature" id="coroutine">
@@ -354,6 +461,10 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>モデル: OBJ と .mtl（材質ごとのサブメッシュと Material）、PMX</li>
             <li>基本形状: 立方体、球、カプセル、円柱、平面、トーラスの Mesh を、ファイルを読まずにコードで作る</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work02/shapes.jpg" alt="立方体、球、カプセル、円柱、平面、トーラスが、市松模様と単色で 2 列に並ぶ場面" width="1280" height="673" loading="lazy">
+            <figcaption>コードで作った基本形状。後ろの段は市松の Lit、前の列は Toon と輪郭線</figcaption>
+          </figure>
         </div>
       </div>
     </section>
@@ -388,26 +499,6 @@ emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></p
             <li>スクリーンショット: そのフレームの全部のパスを描いた後の画面を PNG に書く</li>
             <li>絵の比べ: 時刻を 1/30 秒ずつに固定して撮った絵を、基準の絵と 1 画素ずつ比べ、描画の変化を見つける</li>
           </ul>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="container">
-        <h2 class="section-title">スクリーンショット</h2>
-        <div class="gallery">
-          <figure>
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>説明（仮）</figcaption>
-          </figure>
-          <figure>
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>説明（仮）</figcaption>
-          </figure>
-          <figure>
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>説明（仮）</figcaption>
-          </figure>
         </div>
 
         <a class="back-link" href="../#works">← 作品一覧に戻る</a>

@@ -39,7 +39,7 @@
         <h2 class="section-title">概要</h2>
         <table class="info-table">
           <tr><th>担当</th><td><span class="keep">企画、</span><span class="keep">プログラム、</span><span class="keep">シェーダー</span></td></tr>
-          <tr><th>開発環境</th><td><span class="keep">C++、</span><span class="keep">HLSL、</span><span class="keep">DirectX12</span><span class="keep">（自作フレームワーク）、</span><span class="keep">Visual Studio 2026</span><br><span class="keep">試作: HTML、</span><span class="keep">JavaScript（WebGL2）</span></td></tr>
+          <tr><th>開発環境</th><td><span class="keep">C++、</span><span class="keep">HLSL、</span><span class="keep">DirectX12</span><span class="keep">（自作フレームワーク）、</span><span class="keep">Visual Studio 2026</span></td></tr>
         </table>
       </div>
     </section>
@@ -60,19 +60,6 @@
           <figure class="figure medium">
             <div class="thumb placeholder">画像（仮）</div>
             <figcaption>雨雲の下で草地が広がる様子</figcaption>
-          </figure>
-        </div>
-
-        <div class="feature">
-          <h3>ブラウザー版の試作と同じ結果を出す <span class="keep">C++ への移植</span></h3>
-          <p>遊びの仕組みは、先に HTML と JavaScript（WebGL2 の描画も自作）のブラウザー版の試作で作り、触りながら調整の値を決めました。その計算を C++ に移すときは、乱数も試作と同じ自作のものにして、試作を Node.js で動かして書き出した値と C++ の結果を同じ場面で比べるテストを作りました。</p>
-          <ul>
-            <li>谷の地形の生成と、雨で 240 日育てる場面・野火・1 年分の季節の場面で、試作と同じ集計の値になることを確認（乱数を引いた後の状態まで一致）</li>
-            <li>Release では試作（Edge で 1 ステップ 4.7 ms）の 3〜4 倍の速さ。4 倍速で進めても、計算の時間は 1 秒あたり約 44 ms</li>
-          </ul>
-          <figure class="figure medium">
-            <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>ブラウザー版の試作</figcaption>
           </figure>
         </div>
 

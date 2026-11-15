@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>作品名（仮） | 山木一平</title>
-  <meta name="description" content="作品説明（仮）">
+  <title>DirectX11 フレームワーク | 山木一平</title>
+  <meta name="description" content="C++20 と DirectX11 で作った自作のゲームフレームワークです。MMD のキャラクターの表示とアニメーション、影やポストエフェクトなどの描画、物理、画面の UI と文字、デバッグの道具を作りました。">
   <link rel="stylesheet" href="../css/style.css?v=20261116-3">
 </head>
 <body>
@@ -24,13 +24,70 @@
 
     <section class="work-header">
       <div class="container">
-        <h1>作品名（仮）</h1>
+        <h1>DirectX11 フレームワーク</h1>
         <ul class="tags">
           <li>C++</li>
           <li>DirectX11</li>
+          <li>HLSL</li>
+          <li>PMX / VMD</li>
+          <li>Jolt Physics</li>
         </ul>
         <div class="video placeholder">動画（仮）</div>
-        <p>作品説明（仮）</p>
+        <p>C++20 と DirectX11 で作った、ゲーム作りのための自作のフレームワークです。コードで GameObject と Component を組んでゲームを作る形にし、MMD のキャラクターの表示とアニメーション、影やポストエフェクトなどの描画、物理、画面の UI と文字、開発を助けるデバッグの道具を作りました。</p>
+
+        <nav class="toc" aria-label="目次">
+          <p class="toc-title">目次</p>
+          <ol>
+            <li>
+              <a href="#design">エンジンの設計</a>
+              <ol>
+                <li><a href="#layers">層の分け方と 1 フレームの流れ</a></li>
+                <li><a href="#scene">Scene・GameObject・Component</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="#rendering">描画</a>
+              <ol>
+                <li><a href="#render-passes">描画のパスの流れ</a></li>
+                <li><a href="#shadow">カスケードシャドウマップ</a></li>
+                <li><a href="#lighting">光と陰影</a></li>
+                <li><a href="#toon">トゥーン・スフィア・輪郭線</a></li>
+                <li><a href="#transparency">半透明と切り抜き</a></li>
+                <li><a href="#post-effect">ポストエフェクト</a></li>
+                <li><a href="#sky">手続きの空</a></li>
+                <li><a href="#particle">パーティクル</a></li>
+                <li><a href="#ui-text">画面の UI と文字</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="#mmd">MMD のキャラクター</a>
+              <ol>
+                <li><a href="#pmx">PMX の読み込み</a></li>
+                <li><a href="#skinning">骨とスキン</a></li>
+                <li><a href="#morph">モーフ</a></li>
+                <li><a href="#motion">VMD のモーション</a></li>
+                <li><a href="#swing">揺れもの</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="#systems">ゲームの仕組み</a>
+              <ol>
+                <li><a href="#physics">物理</a></li>
+                <li><a href="#coroutine">コルーチンと Tween</a></li>
+                <li><a href="#audio-input">サウンドと入力</a></li>
+                <li><a href="#assets">資産の管理と基本形状</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="#tools">開発の道具</a>
+              <ol>
+                <li><a href="#debug-tools">デバッグ機能</a></li>
+                <li><a href="#shader-reload">シェーダーの読み直し</a></li>
+                <li><a href="#render-check">描画の確かめの道具</a></li>
+              </ol>
+            </li>
+          </ol>
+        </nav>
       </div>
     </section>
 
@@ -38,42 +95,299 @@
       <div class="container">
         <h2 class="section-title">概要</h2>
         <table class="info-table">
-          <tr><th>制作期間</th><td>（仮）</td></tr>
-          <tr><th>制作人数</th><td>（仮）</td></tr>
-          <tr><th>担当</th><td>（仮）</td></tr>
-          <tr><th>開発環境</th><td>（仮）</td></tr>
-          <tr><th>リンク</th><td><a href="#">GitHub（仮）</a></td></tr>
+          <tr><th>担当</th><td>全体（設計、描画、アニメーション、物理、デバッグの道具）</td></tr>
+          <tr><th>開発環境</th><td>C++20、Direct3D 11、HLSL（シェーダーモデル 5.0）、Visual Studio 2026</td></tr>
+          <tr><th>ライブラリ</th><td>Dear ImGui（デバッグの窓）、Jolt Physics（揺れものの計算）</td></tr>
         </table>
       </div>
     </section>
 
-    <section>
+    <section id="design">
       <div class="container">
-        <h2 class="section-title">技術の見どころ</h2>
+        <h2 class="section-title">エンジンの設計</h2>
 
-        <div class="feature">
-          <h3>見どころ（仮）</h3>
-          <p>説明（仮）</p>
+        <div class="feature" id="layers">
+          <h3>層の分け方と 1 フレームの流れ</h3>
+          <p>エンジンを 7 つの層に分け、下の層は上の層を知らない形にしました。ゲームのコードは Scene の層から使い、描画の層とは、描く物の一覧などの決まった口だけでやり取りします。</p>
+          <ul>
+            <li>層: Utility → Platform → Graphics → Render → Scene → DebugTools → Core（下から順。Core がすべてを組み立てる）</li>
+            <li>Direct3D 11 の型は Graphics と Render の層の中だけで使い、ゲームのコードには出さない</li>
+            <li>1 フレームの流れ: 入力 → 時刻 → 固定ステップの物理 → Update → コルーチン → LateUpdate（モーション、揺れもの、スキン）→ 作る・消すの確定 → 音 → 描く物の収集 → 描画</li>
+          </ul>
         </div>
 
-        <div class="feature">
-          <h3>見どころ（仮）</h3>
-          <p>説明（仮）</p>
-        </div>
-
-        <div class="feature">
-          <h3>見どころ（仮）</h3>
-          <p>説明（仮）</p>
+        <div class="feature" id="scene">
+          <h3>Scene・GameObject・Component</h3>
+          <p>コードで GameObject を作って Component を付け、場面を組み立てます。Component は OnStart・FixedUpdate・Update・LateUpdate などを持ち、フレームの途中で作った物や消した物は、フレームの区切りでまとめて確定します。</p>
+          <ul>
+            <li>標準の Component: カメラ、ライト、MeshRenderer、Rigidbody、Collider、Animator、ParticleEmitter、AudioSource、UiImage、UiText など</li>
+            <li>Scene の切り替えはフレームの頭の 1 か所だけで行い、フレームの途中で頼んでも、そのフレームは前の Scene のまま最後まで動く</li>
+            <li>固定ステップの回数に上限を設け、重いフレームでも止まらないようにした</li>
+          </ul>
+<pre><code>// Scene の OnLoad の中で、火花の粒を出す GameObject を作る
+Engine::GameObject&amp; sparks = CreateObject("Sparks");
+sparks.GetTransform().SetLocalPosition(Engine::Vector3(0.0f, 1.0f, 2.0f));
+Engine::ParticleEmitter&amp; emitter = sparks.AddComponent&lt;Engine::ParticleEmitter&gt;();
+emitter.SetEmissionRate(60.0f);                              // 毎秒 60 個
+emitter.SetAcceleration(Engine::Vector3(0.0f, -9.8f, 0.0f)); // 重力</code></pre>
         </div>
       </div>
     </section>
 
-    <section>
+    <section id="rendering">
       <div class="container">
-        <h2 class="section-title">苦労した点</h2>
-        <div class="feature">
-          <h3>苦労した点（仮）</h3>
-          <p>説明（仮）</p>
+        <h2 class="section-title">描画</h2>
+
+        <div class="feature" id="render-passes">
+          <h3>描画のパスの流れ</h3>
+          <p>描画は、役目ごとに分けたパスを決まった順に並べて行います。パスの前に、頂点モーフの差分を GPU に写し、影の段の範囲を決めます。ゲームのコードから自分のパスを足すこともできます。</p>
+          <ol>
+            <li>ShadowPass: 影の絵を描く</li>
+            <li>SceneTargetPass: ポストエフェクトを使うとき、16 ビットの浮動小数の的に切り替える</li>
+            <li>OpaquePass: 不透明の物を描く</li>
+            <li>SkyPass: 何も描かれていない画素に空を描く</li>
+            <li>OutlinePass: 輪郭線を描く</li>
+            <li>TransparentPass: 半透明の物を、カメラから遠い順に描く</li>
+            <li>ParticlePass: 粒を描く</li>
+            <li>PostEffectPass: ブルーム、トーンマップ、ディザ、FXAA を掛けて画面に出す</li>
+            <li>SpritePass: 画面の UI と文字を描く</li>
+            <li>DebugLinePass、ImGuiPass: デバッグの線と ImGui の窓を描く（Debug 構成だけ）</li>
+          </ol>
+        </div>
+
+        <div class="feature" id="shadow">
+          <h3>カスケードシャドウマップ</h3>
+          <p>平行光源の影を、カメラから決めた距離までを最大 4 つの段に分けたシャドウマップで付けます。近い段ほど細かい影の絵を使うので、手前の影をくっきりさせたまま、遠くまで影を落とせます。</p>
+          <ul>
+            <li>2048×2048 の影の絵を 4 つに分けて使い、影の縁は 3×3 の PCF でやわらげる</li>
+            <li>深度と法線の向きのずらしを、影の絵の 1 テクセルを単位にして決める</li>
+            <li>影の距離の最後の 1 割で影を薄め、影の端が急に切れないようにした</li>
+            <li>Toon の物は、影の所がトゥーンのテクスチャの暗い色になる（MMD のセルフ影の見え方）</li>
+            <li>骨とモーフで動く PMX のモデルは、動いた形の影を落とす</li>
+            <li>デバッグの窓で、段ごとに色を付けて範囲を確かめられる</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="lighting">
+          <h3>光と陰影</h3>
+          <p>平行光源 1 つと、点光源とスポットを場面の全体で 16 個まで置けます。標準のシェーダーは Lit と Toon の 2 つで、Lit はランバート、Toon はトゥーンのテクスチャで陰を付けます。</p>
+          <ul>
+            <li>点光源とスポットは、光ごとに拡散と反射を足す（範囲の端で滑らかに 0 になる減衰と、スポットの角度の減衰）</li>
+            <li>段の付いた反射: Blinn-Phong の反射を、硬い段となだらかな段で切って、アニメ調のハイライトにする</li>
+            <li>リム: 視線と面の向き（N·V）から、輪郭に近い所を光らせる</li>
+            <li>発光: Material ごとの強さとマスクで光らせ、ブルームでにじませる</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="toon">
+          <h3>トゥーン・スフィア・輪郭線</h3>
+          <p>MMD のモデルの見た目に合わせて、トゥーンのテクスチャで付ける陰、スフィアマップ、輪郭線を描けるようにしました。PMX のモデルは、材質の値からこれらを設定します。</p>
+          <ul>
+            <li>スフィアマップは、色を足す形と掛ける形の 2 つ</li>
+            <li>輪郭線: 頂点を法線の向きに押し出した殻の、裏の面だけを描く。どのシェーダーの Material にも付けられる</li>
+            <li>押し出す向きに、同じ位置の頂点の法線を平均した向きも選べ、箱の角や円柱の縁でも線が切れない</li>
+            <li>PMX の頂点ごとのエッジの倍率で、場所ごとに線の太さを変える</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="transparency">
+          <h3>半透明と切り抜き</h3>
+          <p>不透明の物を描いた後に、半透明の物を物ごとにカメラから遠い順に並べ、後ろの色と混ぜて描きます。</p>
+          <ul>
+            <li>切り抜き: テクスチャのアルファで穴を開ける。影も穴の形になる</li>
+            <li>両面: Material ごとに裏の面も描ける</li>
+            <li>テクスチャに透ける画素がある材質は、読み込むときに半透明の描き方にする</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="post-effect">
+          <h3>ポストエフェクト</h3>
+          <p>カメラごとにポストエフェクトを付けられます。使うときは、場面を 16 ビットの浮動小数の的に描いて 1 を超える明るさを残し、効果を掛けてから画面に出します。</p>
+          <ul>
+            <li>ブルーム: 明るさが閾値を超えた所を、5 段のにじみで周りに広げて足す</li>
+            <li>トーンマップ: 露出を掛けた後、明るい所を 1 に近づくように、肩の曲線でなめらかに縮める</li>
+            <li>ディザ: 8 ビットに丸める前に、画素の位置で決まる小さな揺らぎを足し、なだらかな所の縞を消す</li>
+            <li>FXAA: 輝度の差で縁を見つけ、縁に沿って読み直して、斜めの縁のぎざぎざを和らげる</li>
+            <li>画面の UI と文字、デバッグの表示は効果の後に描くので、にじまない</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="sky">
+          <h3>手続きの空</h3>
+          <p>カメラに Component を付けると、光の向きにそろった太陽のある空を描きます。大気の散乱を簡単にした式を画素ごとに計算し、地平線より下は地面の色にします。</p>
+          <ul>
+            <li>物が描かれていない画素だけを塗るので、物の後ろの画素は計算しない</li>
+            <li>太陽の位置は平行光源の向きから決まり、光を回すと空の色も変わる</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="particle">
+          <h3>パーティクル</h3>
+          <p>ParticleEmitter の Component で粒を出し、CPU で動かして、カメラを向く板にして描きます。</p>
+          <ul>
+            <li>毎秒の数、寿命、速さ、出す向きの円錐、加速度、減衰、大きさと色の変化を設定できる</li>
+            <li>混ぜ方は、加算（火花など）とアルファ（煙など）の 2 つ。アルファの粒は、カメラから遠い順に並べて描く</li>
+            <li>粒はワールドの空間に置くので、出した後に出す物を動かしても、粒はその場で動き続ける</li>
+            <li>乱数の種を決めれば、同じ動きを何度でも再現できる</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="ui-text">
+          <h3>画面の UI と文字</h3>
+          <p>画面に重ねる 2D の画像（UiImage）と字（UiText）を、アンカーと基準の解像度で置きます（Unity の RectTransform と Canvas Scaler と同じ考え方）。ポストエフェクトの後に描くので、UI はにじみません。</p>
+          <ul>
+            <li>層と層の中の順で重なりを決め、同じテクスチャの四角が続く所はまとめて 1 回で描く</li>
+            <li>マウスが四角の中にあるかを調べられ、ボタンに使える</li>
+            <li>字は、Windows の字体を DirectWrite で開き、使う字だけを SDF にしてアトラスに入れる（日本語も出る）</li>
+            <li>行送り、揃え、折り返し、簡単な禁則で並べ、縁取りを付けて描く</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="mmd">
+      <div class="container">
+        <h2 class="section-title">MMD のキャラクター</h2>
+
+        <div class="feature" id="pmx">
+          <h3>PMX の読み込み</h3>
+          <p>MMD のモデルの形式 PMX（2.0 と 2.1）を読み込みます。頂点、材質、骨、モーフ、剛体とジョイントを読み、材質の値（色、両面、テクスチャ、トゥーン、スフィア、輪郭線）を Material に入れます。</p>
+          <ul>
+            <li>頂点の重みは BDEF1・BDEF2・BDEF4 に対応（SDEF と QDEF は近い形にして読む）</li>
+            <li>テクスチャのパスは、サブフォルダや日本語の名前も読める</li>
+            <li>壊れた節のあるファイルも、読める所までで表示する</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="skinning">
+          <h3>骨とスキン</h3>
+          <p>Animator の Component で骨のポーズを決め、骨の行列を使って頂点シェーダーでスキンして描きます。</p>
+          <ul>
+            <li>FK と、ほかの骨の回転を受け継ぐ回転の付与</li>
+            <li>IK: 足の IK などを CCD で解く。ひざは 1 つの軸の角度の制限で曲げる</li>
+            <li>骨とモーフで動いた形には、輪郭線と影も付いてくる</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="morph">
+          <h3>モーフ</h3>
+          <p>頂点モーフ、材質モーフ、グループモーフで表情を変えます。</p>
+          <ul>
+            <li>頂点モーフは、重みを掛けた差分を、頂点シェーダーでスキンの前に足す</li>
+            <li>重みが変わったフレームだけ差分を作り直して GPU に写す</li>
+            <li>材質モーフは、色などを足す形と掛ける形に対応</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="motion">
+          <h3>VMD のモーション</h3>
+          <p>MMD のモーションの形式 VMD を読み込み、骨と表情を時間に沿って動かします。</p>
+          <ul>
+            <li>キーの間は VMD の補間曲線（3 次ベジェ）で補い、回転は球面線形補間で補う</li>
+            <li>IK の on と off のキーにも対応</li>
+            <li>負の速さで逆に再生できる</li>
+            <li>2 本のモーションを、決めた秒数で混ぜて切り替える（クロスフェード）</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="swing">
+          <h3>揺れもの</h3>
+          <p>PMX の剛体とジョイントを物理エンジンの Jolt Physics に写し、髪やスカートを揺らします。モデルの値を Jolt の剛体とジョイントに写す所と、骨との受け渡しを作りました。</p>
+          <ul>
+            <li>骨に付いて動く剛体と物理で動く剛体を分け、物理の結果を骨に戻す</li>
+            <li>ジョイントの移動と回転の制限、ばねを写す</li>
+            <li>当たりのグループ（16 のグループとマスク）を、Jolt の層の値に詰めて写す</li>
+            <li>モーションを止めている間も、毎フレーム物理を進める</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="systems">
+      <div class="container">
+        <h2 class="section-title">ゲームの仕組み</h2>
+
+        <div class="feature" id="physics">
+          <h3>物理</h3>
+          <p>ゲームの物の動きと当たり判定の物理は、自分で作りました（揺れものの Jolt Physics とは別）。</p>
+          <ul>
+            <li>Rigidbody: 重力と速度で動かす。Kinematic の物で押せる</li>
+            <li>Collider: 球・箱・カプセル。衝突と Trigger のコールバック</li>
+            <li>重なりの押し戻しで、箱を積み重ねられる</li>
+            <li>問い合わせ: レイを当てて最も近い 1 つを返す、形を重ねて当たる物を集める（球・箱・カプセル）、画面の点（マウス）からのレイを作る</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="coroutine">
+          <h3>コルーチンと Tween</h3>
+          <p>C++20 のコルーチンで、待ってから動く処理や演出の流れを、状態の変数を持たずに 1 つの関数の中に順に書けるようにしました。</p>
+          <ul>
+            <li>co_await で、秒（時間の倍率あり・なし）、フレームの数、条件、子のコルーチンを待つ</li>
+            <li>Component が止まっている間は進まず、Component を消すときに一緒に壊す</li>
+            <li>Tween: 数、ベクトル、回転（Quaternion）を時間で動かすコルーチンの関数。イージングの曲線は 30 種</li>
+          </ul>
+<pre><code>Engine::Coroutine Blink() {
+    for (;;) {
+        co_await Engine::WaitForSeconds(2.0f); // 時間の倍率を掛けた 2 秒
+        SetLit(false);
+        co_await Engine::WaitForFrames(3);     // 3 フレーム
+        SetLit(true);
+    }
+}</code></pre>
+        </div>
+
+        <div class="feature" id="audio-input">
+          <h3>サウンドと入力</h3>
+          <p>Windows の XAudio2 で WAV を鳴らします。AudioSource と AudioListener の Component で、聞き手との位置から 3D の音にします。</p>
+          <ul>
+            <li>主の音量と、BGM と効果音のバスで、音量を分けて変えられる</li>
+            <li>入力: キー、マウス、XInput のパッド 4 台（ボタン、スティック、トリガー）を、同じ口で読む</li>
+            <li>カメラの操作: Unity の SceneView のように、マウスとキーボードでカメラを動かす Component</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="assets">
+          <h3>資産の管理と基本形状</h3>
+          <p>AssetManager で、テクスチャ、モデル、モーション、音、字体を読み込みます。読んだ物は取っておき、同じファイルを使う物どうしで共有します。</p>
+          <ul>
+            <li>テクスチャ: Windows の WIC で読める形式（PNG、JPEG、BMP など）</li>
+            <li>モデル: OBJ と .mtl（材質ごとのサブメッシュと Material）、PMX</li>
+            <li>基本形状: 立方体、球、カプセル、円柱、平面、トーラスの Mesh を、ファイルを読まずにコードで作る</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="tools">
+      <div class="container">
+        <h2 class="section-title">開発の道具</h2>
+
+        <div class="feature" id="debug-tools">
+          <h3>デバッグ機能</h3>
+          <p>Debug 構成では、Dear ImGui で作った窓から、場面の中身を見て、その場で直せます。</p>
+          <ul>
+            <li>階層とインスペクター: GameObject の有効、Transform、Component の値を直す</li>
+            <li>ギズモ: 選んだ物を、画面の取っ手で動かす・回す・大きさを変える（ワールドとローカルの軸、Ctrl で刻む）</li>
+            <li>コードとしてコピー: 直した値を、ソースに貼れる形でクリップボードに入れる</li>
+            <li>資産の窓: 読んだ資産の持ち主の数と読んだ回数、テクスチャの縮小と読み直し、音の試し</li>
+            <li>デバッグの線: Collider の形などを線で描く</li>
+            <li>窓の言葉を、日本語と英語で切り替えられる</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="shader-reload">
+          <h3>シェーダーの読み直し</h3>
+          <p>標準のシェーダーの .hlsl を直して F5 を押すと、アプリを止めずに新しいシェーダーで描きます。すべてのシェーダーをコンパイルでき、C++ の側と食い違わないときだけ入れ替えるので、途中で書き間違えても絵は壊れません。</p>
+        </div>
+
+        <div class="feature" id="render-check">
+          <h3>描画の確かめの道具</h3>
+          <p>描画を確かめるための道具は、Release 構成にも入れています。</p>
+          <ul>
+            <li>パスごとの GPU のマーカー: RenderDoc で 1 フレームを撮ると、パスの名前が描く順に並ぶ</li>
+            <li>スクリーンショット: そのフレームの全部のパスを描いた後の画面を PNG に書く</li>
+            <li>絵の比べ: 時刻を 1/30 秒ずつに固定して撮った絵を、基準の絵と 1 画素ずつ比べ、描画の変化を見つける</li>
+          </ul>
         </div>
       </div>
     </section>

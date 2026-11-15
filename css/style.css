@@ -5,7 +5,6 @@
   --muted: #5b6370;
   --border: #dde1e7;
   --accent: #2f6fde;
-  --accent-text: #ffffff;
   --tag-bg: #e8eefb;
   --radius: 10px;
   --max-width: 1080px;
@@ -21,7 +20,6 @@
     --muted: #9aa3b0;
     --border: #2e333c;
     --accent: #6b9cff;
-    --accent-text: #0e1116;
     --tag-bg: #253049;
   }
 }
@@ -161,29 +159,7 @@ main [id]:not(section) {
 .hero .lead {
   color: var(--muted);
   font-size: 1.1rem;
-  margin: 0 0 24px;
-}
-
-.button {
-  display: inline-block;
-  padding: 10px 20px;
-  border-radius: var(--radius);
-  background: var(--accent);
-  color: var(--accent-text);
-  text-decoration: none;
-  font-weight: 700;
-}
-
-.button.secondary {
-  background: transparent;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-}
-
-.button-row {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  margin: 0;
 }
 
 /* ---- プロフィール ---- */

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>作品名（仮） | 山木一平</title>
-  <meta name="description" content="作品説明（仮）">
+  <title>天気の箱庭（仮題） | 山木一平</title>
+  <meta name="description" content="天気で自然を育てる箱庭のシミュレーションゲーム（制作中）。自作の DirectX12 フレームワークの上で、C++ で作っています。">
   <link rel="stylesheet" href="../css/style.css?v=20261116-2">
 </head>
 <body>
@@ -24,13 +24,13 @@
 
     <section class="work-header">
       <div class="container">
-        <h1>作品名（仮）</h1>
+        <h1>天気の箱庭（仮題）</h1>
         <ul class="tags">
           <li>C++</li>
           <li>DirectX12</li>
         </ul>
         <div class="video placeholder">動画（仮）</div>
-        <p>作品説明（仮）</p>
+        <p>天気で自然を育てる、箱庭のシミュレーションゲームです（制作中）。荒れた谷に雨雲や晴れ間を置くと、土の湿り気や温度が変わり、苔から草地、花の草原、森へと植物が移り変わっていきます。人や建物は登場せず、写実寄りの景色を眺めて楽しめる箱庭を目指して、自作の DirectX12 フレームワークの上で作っています。</p>
       </div>
     </section>
 
@@ -38,11 +38,8 @@
       <div class="container">
         <h2 class="section-title">概要</h2>
         <table class="info-table">
-          <tr><th>制作期間</th><td>（仮）</td></tr>
-          <tr><th>制作人数</th><td>（仮）</td></tr>
-          <tr><th>担当</th><td>（仮）</td></tr>
-          <tr><th>開発環境</th><td>（仮）</td></tr>
-          <tr><th>リンク</th><td><a href="#">GitHub（仮）</a></td></tr>
+          <tr><th>担当</th><td><span class="keep">企画、</span><span class="keep">プログラム、</span><span class="keep">シェーダー</span></td></tr>
+          <tr><th>開発環境</th><td><span class="keep">C++、</span><span class="keep">HLSL、</span><span class="keep">DirectX12</span><span class="keep">（自作フレームワーク）、</span><span class="keep">Visual Studio 2026</span><br><span class="keep">試作: HTML、</span><span class="keep">JavaScript（WebGL2）</span></td></tr>
         </table>
       </div>
     </section>
@@ -52,18 +49,59 @@
         <h2 class="section-title">技術の見どころ</h2>
 
         <div class="feature">
-          <h3>見どころ（仮）</h3>
-          <p>説明（仮）</p>
+          <h3>天気で育つ<span class="keep">谷のシミュレーション</span></h3>
+          <p>512 m 四方の谷を 2 m のセルに分けた 256 × 256 のグリッドで、セルごとに湿り気、温度、土の養分、日当たり、水深、雪、野火、土の中の種などの値を持たせています。雨・しみ込み・水の流れ・野火は 0.1 日ごと、日当たり・温度・乾き・植物は半日ごとに計算し、条件に応じてセルごとに植物の段階が進んだり戻ったりします。</p>
+          <ul>
+            <li>植物の段階は 9 つ（荒れ地 → 苔と地衣 → 草地 → 花の草原 → 低木 → 若い森 → 古い森。水の多い低地は湿地、寒い高地は高山の草）</li>
+            <li>値は種類ごとの配列（SoA）で持ち、メインスレッドとは別のワーカースレッドで計算</li>
+            <li>描画側へは、セルごとに 32 ビットに詰めた値と、前回から変わった行の範囲だけを渡す</li>
+            <li>256 × 256 の 1 ステップは約 1.1 ms（Release。雨雲 4 つで 120 日育てた谷）</li>
+          </ul>
+          <figure class="figure medium">
+            <div class="thumb placeholder">画像（仮）</div>
+            <figcaption>雨雲の下で草地が広がる様子</figcaption>
+          </figure>
         </div>
 
         <div class="feature">
-          <h3>見どころ（仮）</h3>
-          <p>説明（仮）</p>
+          <h3>ブラウザー版の試作と同じ結果を出す <span class="keep">C++ への移植</span></h3>
+          <p>遊びの仕組みは、先に HTML と JavaScript（WebGL2 の描画も自作）のブラウザー版の試作で作り、触りながら調整の値を決めました。その計算を C++ に移すときは、乱数も試作と同じ自作のものにして、試作を Node.js で動かして書き出した値と C++ の結果を同じ場面で比べるテストを作りました。</p>
+          <ul>
+            <li>谷の地形の生成と、雨で 240 日育てる場面・野火・1 年分の季節の場面で、試作と同じ集計の値になることを確認（乱数を引いた後の状態まで一致）</li>
+            <li>Release では試作（Edge で 1 ステップ 4.7 ms）の 3〜4 倍の速さ。4 倍速で進めても、計算の時間は 1 秒あたり約 44 ms</li>
+          </ul>
+          <figure class="figure medium">
+            <div class="thumb placeholder">画像（仮）</div>
+            <figcaption>ブラウザー版の試作</figcaption>
+          </figure>
         </div>
 
         <div class="feature">
-          <h3>見どころ（仮）</h3>
-          <p>説明（仮）</p>
+          <h3>セルの値から地面を描く<span class="keep">仮のグラフィックス</span></h3>
+          <p>シミュレーションの値を 1 枚の R8 テクスチャ（植物の覆い、湿り気、水深、雪、花、重ね表示の 6 つの帯）にまとめ、地形のピクセルシェーダーで地面の色を作って、フレームワークのライティングで陰影を付けています。テクスチャへの書き込みは、値が変わったときだけ、1 秒に 10 回までにまとめています。</p>
+          <ul>
+            <li>湿り気・温度・植物の段階・水深・日当たりを地形に色で重ねる表示と凡例</li>
+            <li>花の草原が広がると蝶が飛んでくる（羽ばたきは頂点シェーダーで動かす）</li>
+            <li>雨雲と晴れ間を置く・動かす・消す操作、俯瞰のカメラ、時間の速さの切り替え（停止・×1・×2・×4）</li>
+          </ul>
+          <figure class="figure medium">
+            <div class="thumb placeholder">画像（仮）</div>
+            <figcaption>湿り気を色で重ねた表示</figcaption>
+          </figure>
+        </div>
+
+        <div class="feature">
+          <h3>木の手続き生成（試作）</h3>
+          <p>谷に植える木を、7 つの樹種（コナラ、ヤマザクラ、イロハモミジ、スギ、アカマツ、ツツジ、枯れ木）ごとのパラメーターから手続きで生成します。今はブラウザー版の試作（WebGL2 の描画も自作）で、これからフレームワークに移して谷に植えます。</p>
+          <ul>
+            <li>枝の骨組みは、広葉樹は Space Colonization、針葉樹は幹から段ごとに枝を出す形、低木は根元から何本も伸ばす形で作り、枝の太さはパイプモデルで決める</li>
+            <li>同じ樹種と乱数の種からは同じ形ができ、LOD を 3 段階作る</li>
+            <li>樹齢（若木から老木まで）、季節（葉の色、落葉、花）、雪、焼け、風の揺れ（幹・枝・葉の 3 段）は、形を作り直さずにシェーダーの値で変える</li>
+          </ul>
+          <figure class="figure medium">
+            <div class="thumb placeholder">画像（仮）</div>
+            <figcaption>コナラの四季</figcaption>
+          </figure>
         </div>
       </div>
     </section>
@@ -72,8 +110,26 @@
       <div class="container">
         <h2 class="section-title">苦労した点</h2>
         <div class="feature">
-          <h3>苦労した点（仮）</h3>
-          <p>説明（仮）</p>
+          <h3>遊びの手応えの調整</h3>
+          <p>最初の試作では、植物の段階が進むのに 10 日から 150 日かかり、雨を降らせてもなかなか景色が変わりませんでした。段階が進む日数を苔 1 日〜古い森 25 日に縮め、それに合わせて戻る日数や土が肥える速さも見直して、雨を降らせると数秒で緑が広がる手応えにしました。また、強い雨の中心が湿りすぎて森にならず草地で止まってしまう問題は、湿り気の上限ではなく、地表にたまった水の量で成長を止める形に変えて直しました。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">今後の開発予定</h2>
+        <div class="feature">
+          <p>今は、シミュレーションと基本の操作を仮のグラフィックスで確かめた段階です。これから次のものを作っていきます。</p>
+          <ul>
+            <li>天気の操作を増やす（霧、風、気温、季節、雷による野火）。天気をカードとして選び、マナを使って置く形にする</li>
+            <li>季節の移り変わりと雪、水が集まってできる池や川</li>
+            <li>俯瞰に加えて、低い空と地面からの視点（景色を眺める、生き物を観察して図鑑に載せる、写真を撮る）</li>
+            <li>小さな生き物（蝶、魚、カエル）と、段階ごとの目標やお題</li>
+            <li>フレームワークに自然の描画（地形、草木の大量描画、水、空と雲）を足し、写実寄りの景色にする</li>
+            <li>環境音と BGM</li>
+            <li>最初の版を出した後、アップデートで動物を追加する</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -84,15 +140,15 @@
         <div class="gallery">
           <figure>
             <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>説明（仮）</figcaption>
+            <figcaption>始まりの荒れた谷</figcaption>
           </figure>
           <figure>
             <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>説明（仮）</figcaption>
+            <figcaption>雨で緑が戻った谷</figcaption>
           </figure>
           <figure>
             <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>説明（仮）</figcaption>
+            <figcaption>花の草原に来た蝶</figcaption>
           </figure>
         </div>
 

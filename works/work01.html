@@ -619,6 +619,16 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>計算シェーダーで 1 本ずつ視錐台と距離で選び、LOD を決める</li>
             <li>描く数も GPU が書き、ExecuteIndirect で描く。CPU は見える数を読み戻さない</li>
           </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/vegetation-sakura.jpg" alt="草原の真ん中に桜の木が立ち、奥に針葉樹の森と岩山が広がる場面" width="1280" height="720" loading="lazy">
+              <figcaption>草原と森の中の桜</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/vegetation-grass.jpg" alt="地面の近くから見上げた草むら。草の葉が一枚ずつ並び、桜の花びらが舞っている" width="1280" height="720" loading="lazy">
+              <figcaption>地面の近くから見た草むら</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="culling">

@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DirectX12 フレームワーク | 山木一平</title>
-  <meta name="description" content="C++20 と DirectX12 で作った自作のゲームフレームワークです。DXR のレイトレーシング（影と AO）、メッシュシェーダー、PBR、Bindless、複数スレッドでのコマンドの記録と、ゲームを作るためのエディターを作りました。">
+  <title>DirectX12 エンジン | 山木一平</title>
+  <meta name="description" content="C++20 と DirectX12 で作った自作のゲームエンジンです。エディター、Component のリフレクション、DXR のレイトレーシング、PBR、FBX と VRM のキャラクター、地形と GPU の草木、剛体物理などを作りました。">
   <link rel="stylesheet" href="../css/style.css?v=20261116-6">
 </head>
 <body>
@@ -24,7 +24,7 @@
 
     <section class="work-header">
       <div class="container">
-        <h1>DirectX12 フレームワーク</h1>
+        <h1>DirectX12 エンジン</h1>
         <ul class="tags">
           <li>C++</li>
           <li>DirectX12</li>
@@ -34,7 +34,7 @@
         <div class="video">
           <img src="../images/work01/header.jpg" alt="柱の並ぶ広場に、金属や粗さの違う球、格子の箱、光る柱、黒い輪の中の銅の球などを並べた場面" width="1280" height="720">
         </div>
-        <p>C++20 と DirectX12 で作った、ゲーム作りのための自作のフレームワークです。自作の DirectX11 フレームワークを元に描画の層を Direct3D 12 で作り直し、DXR のレイトレーシング（影と AO）、メッシュシェーダー、PBR、Bindless、複数スレッドでのコマンドの記録と、ゲームを作るためのエディターを作りました。</p>
+        <p>C++20 と DirectX12 で作った自作のゲームエンジンです。自作の DirectX11 フレームワークを元に描画の層を Direct3D 12 で作り直し、ゲームを作るためのエディターと Component の仕組み、DXR のレイトレーシング、PBR、FBX と VRM のキャラクター、地形と GPU の草木、剛体物理などを作りました。</p>
 
         <nav class="toc" aria-label="目次">
           <p class="toc-title">目次</p>
@@ -43,7 +43,32 @@
               <a href="#structure">全体の形</a>
               <ol>
                 <li><a href="#rebuild">DirectX11 版からの作り直し</a></li>
+                <li><a href="#configs">Debug・Development・Release</a></li>
                 <li><a href="#render-passes">描画のパスの流れ</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="#engine">エンジンの仕組み</a>
+              <ol>
+                <li><a href="#component">Scene・GameObject・Component</a></li>
+                <li><a href="#reflection">Component のリフレクション</a></li>
+                <li><a href="#physics">傾いて転がる剛体物理</a></li>
+                <li><a href="#ui">UI の入れ子と 9 スライス</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="#editing">エディター</a>
+              <ol>
+                <li><a href="#editor">エディター</a></li>
+                <li><a href="#picking">Scene の窓のクリック選択</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="#character">キャラクター</a>
+              <ol>
+                <li><a href="#fbx">FBX の読み込み</a></li>
+                <li><a href="#vrm">VRM の読み込みと揺れもの</a></li>
+                <li><a href="#retarget">人型のモーションの移し</a></li>
               </ol>
             </li>
             <li>
@@ -62,16 +87,25 @@
                 <li><a href="#mesh-shader">メッシュシェーダーの輪郭線</a></li>
                 <li><a href="#hdr">線形の色と HDR</a></li>
                 <li><a href="#pbr">PBR と法線マップ</a></li>
+                <li><a href="#ibl">空から作る環境の光（IBL）</a></li>
                 <li><a href="#msaa">MSAA と自作の解決</a></li>
                 <li><a href="#from-dx11">DirectX11 版から移した描画</a></li>
               </ol>
             </li>
             <li>
-              <a href="#tools">エンジンと開発の道具</a>
+              <a href="#world">地形と物の多い場面</a>
+              <ol>
+                <li><a href="#terrain">地形</a></li>
+                <li><a href="#vegetation">GPU の草木</a></li>
+                <li><a href="#culling">視錐台カリング・自動インスタンス化・LOD</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="#tools">資産と開発の道具</a>
               <ol>
                 <li><a href="#game-shader">ゲーム側のシェーダー</a></li>
                 <li><a href="#loading">glTF と裏の読み込み</a></li>
-                <li><a href="#editor">エディター</a></li>
+                <li><a href="#meshreduce">素材の道具 MeshReduce</a></li>
                 <li><a href="#others">そのほかの機能</a></li>
               </ol>
             </li>
@@ -87,7 +121,7 @@
           <tr><th>制作期間</th><td>2026年7月〜</td></tr>
           <tr><th>担当</th><td>全体（設計、描画、レイトレーシング、エディター）</td></tr>
           <tr><th>開発環境</th><td>C++20、Direct3D 12、HLSL（シェーダーモデル 6.6、DXC）、Visual Studio 2026</td></tr>
-          <tr><th>ライブラリ</th><td>Dear ImGui（エディターの窓）、Jolt Physics（揺れものの計算）、DirectX-Headers（d3dx12）</td></tr>
+          <tr><th>ライブラリ</th><td>Dear ImGui（エディターの窓）、Jolt Physics（PMX の揺れものの計算）、DirectX-Headers（d3dx12）</td></tr>
         </table>
       </div>
     </section>
@@ -100,9 +134,19 @@
           <h3>DirectX11 版からの作り直し</h3>
           <p>自作の <a href="work02.html">DirectX11 フレームワーク</a>を元に、ゲームのコードが使う Scene の層（Scene・GameObject・Component）はそのままにして、その下の描画の層を Direct3D 12 で作り直しました。そのうえで、DirectX12 で使えるようになるレイトレーシング、メッシュシェーダー、Bindless、複数のキューを使う形を足しています。</p>
           <ul>
-            <li>Direct3D 12 の型は Graphics と Render の層の中だけで使い、ゲームのコードには出さない</li>
+            <li>Direct3D 12 の型はエンジンの描画まわりだけで使い、ゲームのコードには出さない</li>
             <li>作り直しの途中で、DirectX11 版と同じ場面を同じフレームで撮って比べ、物が欠ける・色が違うなどの違いが無いことを確かめた</li>
-            <li>Debug 構成ではエディターの窓の中に、Release 構成では画面に直接ゲームを描く</li>
+            <li>Debug と Development 構成ではエディターの窓の中に、Release 構成では画面に直接ゲームを描く</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="configs">
+          <h3>Debug・Development・Release</h3>
+          <p>開発の段階に合わせて、3 つのビルド構成を使い分けています。</p>
+          <ul>
+            <li>Debug: 最適化なし。エディター、アサート、D3D12 のデバッグレイヤーが入る</li>
+            <li>Development: 最適化を掛けたまま、エディターとアサートを使える。デバッグレイヤーは要るときだけ入れる</li>
+            <li>Release: エディターとアサートを外し、リンク時の最適化を掛ける配布用の構成</li>
           </ul>
         </div>
 
@@ -114,6 +158,7 @@
             <li>ShadowPass: カスケードシャドウマップを描く</li>
             <li>SceneTargetPass: 16 ビットの浮動小数で MSAA の場面の的に切り替える</li>
             <li>OpaquePass: 不透明の物を描く</li>
+            <li>VegetationPass: 計算シェーダーで選んだ草木を描く</li>
             <li>SkyPass: 何も描かれていない画素に空を描く</li>
             <li>OutlinePass: 輪郭線を描く</li>
             <li>TransparentPass: 半透明の物を、カメラから遠い順に描く</li>
@@ -121,8 +166,124 @@
             <li>AmbientOcclusionPass: DXR で AO を求めて、場面の色に掛ける（使うカメラだけ）</li>
             <li>PostEffectPass: MSAA を 1 サンプルに解決し、ブルーム、露出とトーンマップ、ディザ、FXAA を掛け、sRGB に直して画面に出す</li>
             <li>SpritePass: 画面の UI と文字を描く</li>
-            <li>ImGuiPass: エディターの窓を描く（Debug 構成だけ）</li>
+            <li>エディターのパス: 線、クリック選択、選んだ物の縁、エディターの窓を描く（Debug と Development 構成）</li>
           </ol>
+        </div>
+      </div>
+    </section>
+
+    <section id="engine">
+      <div class="container">
+        <h2 class="section-title">エンジンの仕組み</h2>
+
+        <div class="feature" id="component">
+          <h3>Scene・GameObject・Component</h3>
+          <p>コードで GameObject を作って Component を付け、場面を組み立てます。DirectX11 版の形を引き継ぎ、物の多い場面でも速く回るように作り直しました。</p>
+          <ul>
+            <li>Component は OnStart、FixedUpdate、Update、LateUpdate などを持つ</li>
+            <li>コールバックを持つかどうかをコンパイル時に判定し、要らない呼び出しを省く</li>
+            <li>物の情報を 1 つの表に集めたデータ指向の形にした</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="reflection">
+          <h3>Component のリフレクション</h3>
+          <p>C++ には実行時に型の中身を見る仕組みが無いので、Component の欄を表にして登録する仕組みを作りました。1 つの表から、インスペクターの表示と「コードとしてコピー」を作ります。</p>
+          <ul>
+            <li>.cpp に登録のマクロを 1 行書くと、起動時に型が登録される</li>
+            <li>欄はセッター経由、ラムダ、メンバの直接のどれでも書ける</li>
+            <li>値の型: bool、整数、float、Vector2〜4、Quaternion、enum、文字列、構造体、optional、vector</li>
+            <li>エンジンの Component とゲームの Component を同じ形で登録する</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="physics">
+          <h3>傾いて転がる剛体物理</h3>
+          <p>ゲームの物理は自分で作っています。物が回転し、傾いて転がり、積み重なります。</p>
+          <ul>
+            <li>形: 球、箱、カプセル。固定ステップで進める</li>
+            <li>慣性を形から計算する。複数の形は体積で質量を分け、重心の指定は平行軸の定理で扱う</li>
+            <li>箱どうしは分離軸（面 6 軸と辺 9 軸）で判定し、Sutherland-Hodgman で切り取って接点を最大 4 点求める</li>
+            <li>逐次インパルスとウォームスタートで解き、摩擦と転がり抵抗を入れる</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="ui">
+          <h3>UI の入れ子と 9 スライス</h3>
+          <p>画面の UI を、アンカー、ピボット、基準の解像度で置きます。</p>
+          <ul>
+            <li>親をたどる入れ子。親の回転、倍率、グループの透明度が子に効く</li>
+            <li>9 スライス: 角を伸ばさず最大 9 枚に分けて描く。枠の倍率、中央の省略、UV の反転に対応</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="editing">
+      <div class="container">
+        <h2 class="section-title">エディター</h2>
+
+        <div class="feature" id="editor">
+          <h3>エディター</h3>
+          <p>Debug と Development 構成では、Dear ImGui を使ったエディターの窓から、場面を見て、その場で直せます。</p>
+          <ul>
+            <li>Game の窓: 場面を専用の的に描き、その絵を窓の中に出す</li>
+            <li>Scene の窓: 編集用のカメラから見た場面を、同じ光と描き方でもう一度描く</li>
+            <li>階層、インスペクター、資産、プロジェクト、ログ、途中の的の窓</li>
+            <li>窓の配置: 既定の形と 4 列の形を切り替える。4 列では Game と Scene の窓が両方 16:9 になる幅を計算する</li>
+            <li>再生、停止、一時停止、1 フレーム送り。停止すると、再生を始めたときの場面をコードから作り直す</li>
+            <li>描画の確かめ: 途中の的を並べて見る窓と、材質の値を色で見る表示</li>
+            <li>シェーダーの読み直し: F5 で描画のシェーダーと読み込んだ計算シェーダーをコンパイルし、全部通って C++ の側と食い違わないときだけ入れ替える。古い PSO は GPU が使い終わってから手放す</li>
+            <li>パスごとの GPU のマーカー、デバッグレイヤーの文をログに出す仕組み、デバイスが落ちたときの DRED の記録</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="picking">
+          <h3>Scene の窓のクリック選択</h3>
+          <p>Scene の窓で物をクリックすると、その物を選べます。GPU に物の番号を描いて読み戻す形なので、見えている形のとおりに選べます。</p>
+          <ul>
+            <li>R32_UINT の的と深度に、シザーでクリックした 1 画素だけを描いて読み戻す</li>
+            <li>骨で動くモデルは描いている姿勢で当たり、切り抜きの穴は抜ける</li>
+            <li>半透明の物も選べる。ドラッグとクリックは、動いた距離で分ける</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="character">
+      <div class="container">
+        <h2 class="section-title">キャラクター</h2>
+
+        <div class="feature" id="fbx">
+          <h3>FBX の読み込み</h3>
+          <p>バイナリ形式の FBX（7.x）の読み手を、外部のライブラリを使わずに作りました。</p>
+          <ul>
+            <li>圧縮された配列を、自作の Inflate で展開する</li>
+            <li>形、材質、スキン（1 頂点に骨 4 本）、埋め込みテクスチャを読み、軸と単位を直す</li>
+            <li>モーションの移動と回転の曲線を読む</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="vrm">
+          <h3>VRM の読み込みと揺れもの</h3>
+          <p>VRM 0.x を、自作の glTF の読み手を広げて読みます。</p>
+          <ul>
+            <li>人型の骨の対応、表情、揺れもの、材質の値を読む</li>
+            <li>表情はモーフのグループにして動かす</li>
+            <li>髪やスカートの揺れは、自作の SpringBone（惰性、硬さ、重力、骨の長さ、球の当たり）で計算する</li>
+            <li>MToon の値を、エンジンの Toon シェーダーの値へ変換して描く</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="retarget">
+          <h3>人型のモーションの移し</h3>
+          <p>Mixamo のモーションを、骨の違う VRoid のモデルに移して再生できるようにしました。</p>
+          <ul>
+            <li>骨を名前で当て、残りを人型の印で当てる</li>
+            <li>腰の移動を、モデルの高さの比で縮める</li>
+            <li>相手に無い骨の回転は子の骨へ畳む</li>
+            <li>VMD とサンプルの 2 つのモーションの形の間でもクロスフェードできる</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -146,9 +307,9 @@
 
         <div class="feature" id="bindless">
           <h3>Bindless</h3>
-          <p>テクスチャごとにディスクリプタテーブルを切り替えず、シェーダーが番号でディスクリプタヒープから直接テクスチャを引く形（シェーダーモデル 6.6 の Bindless）にしました。ルートシグネチャはエンジン全体で 1 本です。</p>
+          <p>テクスチャごとにディスクリプタテーブルを切り替えず、シェーダーが番号でディスクリプタヒープから直接テクスチャを引く形（シェーダーモデル 6.6 の Bindless）にしました。描画のルートシグネチャはエンジン全体で 1 本です。</p>
           <ul>
-            <li>描く物ごとのテクスチャの番号は、ルート定数（12 個）で渡す</li>
+            <li>描く物ごとのテクスチャの番号は、ルート定数（14 個）で渡す</li>
             <li>シェーダーは DXC でシェーダーモデル 6.6 にコンパイルする</li>
             <li>起動するときに、GPU がシェーダーモデル 6.6 と Resource Binding Tier 3 に対応しているかを確かめる</li>
             <li>レイトレーシングの TLAS や、切り抜きの判定で読む頂点とインデックスのバッファも、同じヒープから番号で引く</li>
@@ -160,7 +321,7 @@ cbuffer TextureIndexBuffer : register(b9)
     uint g_toonTextureIndex;
     uint g_sphereTextureIndex;
     uint g_normalTextureIndex;
-    // ……（全部で 12 個）
+    // ……（全部で 14 個）
 };
 
 // シェーダーから見えるディスクリプタヒープから、番号で直接引く
@@ -194,8 +355,8 @@ Texture2D GetNormalTexture() { return ResourceDescriptorHeap[g_normalTextureInde
           <h3>レイトレーシングの影（RayQuery）</h3>
           <p>平行光源の影を、シャドウマップの代わりに DXR のインラインのレイトレーシング（RayQuery）で付けられるようにしました。ピクセルシェーダーから光の向きへ影の光線を飛ばし、何かに当たれば影にします。</p>
           <ul>
-            <li>メッシュごとの BLAS と、場面の TLAS を毎フレーム作る</li>
-            <li>骨で動くモデルは、計算シェーダーでスキンした位置から BLAS を毎フレーム作り直すので、動いた形の影が落ちる</li>
+            <li>BLAS はメッシュごとに 1 度作り、場面の TLAS を毎フレーム作る</li>
+            <li>骨で動くモデルは、計算シェーダーでスキンした位置から BLAS を毎フレーム更新するので、動いた形の影が落ちる</li>
             <li>切り抜きのマテリアルは、当たった三角形の UV でテクスチャのアルファを読み、穴の形の影にする</li>
             <li>影の光線は、最初に当たった所で止める</li>
             <li>DXR（Tier 1.1）に対応しない GPU では、シャドウマップに切り替えて描く</li>
@@ -322,6 +483,16 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
           </div>
         </div>
 
+        <div class="feature" id="ibl">
+          <h3>空から作る環境の光（IBL）</h3>
+          <p>空の式を計算シェーダーで評価して、環境の光を実行時に作ります。</p>
+          <ul>
+            <li>鏡面: GGX の重点サンプリングで、粗さごとのミップを持つ 64×64 のキューブマップを作る</li>
+            <li>拡散: 球面調和の 9 係数を求める</li>
+            <li>毎フレーム作り直しても、RTX 4060 Laptop で約 0.06 ms（Release、720p）</li>
+          </ul>
+        </div>
+
         <div class="feature" id="msaa">
           <h3>MSAA と自作の解決</h3>
           <p>場面の的を MSAA（既定 4x）にし、1 サンプルへの解決を自作のシェーダーで行います。画面に出る色に合わせて平均するので、暗い輪郭線が太く見えたり、とても明るい物の縁に段が残ったりしません。</p>
@@ -361,17 +532,56 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
       </div>
     </section>
 
+    <section id="world">
+      <div class="container">
+        <h2 class="section-title">地形と物の多い場面</h2>
+
+        <div class="feature" id="terrain">
+          <h3>地形</h3>
+          <p>高さの格子から地形を作り、層で塗り分けます。</p>
+          <ul>
+            <li>塊ごとに 4 段の LOD を持ち、継ぎ目はスカートで隠す</li>
+            <li>高さ、法線、レイの問い合わせと、歩ける所の判定</li>
+            <li>最大 8 層を、画素ごとに上位 4 層まで高さで混ぜる。三平面投影に対応</li>
+            <li>折れ線から川の形を彫る（淵と滝を含む）</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="vegetation">
+          <h3>GPU の草木</h3>
+          <p>草木を、傾き、高さ、水際などの決まりで散らし、GPU で選んで描きます。</p>
+          <ul>
+            <li>同じ入力なら同じ配置になる</li>
+            <li>計算シェーダーで 1 本ずつ視錐台と距離で選び、LOD を決める</li>
+            <li>描く数も GPU が書き、ExecuteIndirect で描く。CPU は見える数を読み戻さない</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="culling">
+          <h3>視錐台カリング・自動インスタンス化・LOD</h3>
+          <p>物の多い場面でも、CPU の記録が重くならないようにしました。</p>
+          <ul>
+            <li>視錐台カリング: 球で判定し、視点と影の段ごとに行う。影を落とす 20,000 個で、影の記録が 21.19 ms から 1.12 ms に減った</li>
+            <li>自動インスタンス化: 同じメッシュと Material の物をまとめて描く。7,000 個で、不透明の記録が 0.92 ms から 0.05 ms に減った</li>
+            <li>LodGroup: 最大 8 段を画面の大きさで選び、ディザで切り替える</li>
+            <li>数値は Release、RTX 4060 Laptop、i7-13700H、720p、同じ立方体を並べた場面で測った</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
     <section id="tools">
       <div class="container">
-        <h2 class="section-title">エンジンと開発の道具</h2>
+        <h2 class="section-title">資産と開発の道具</h2>
 
         <div class="feature" id="game-shader">
           <h3>ゲーム側のシェーダー</h3>
           <p>ゲームのフォルダに置いた .hlsl を、エンジンの標準のシェーダーと同じ決まりでビルドし、マテリアルに渡して描けるようにしました。</p>
           <ul>
-            <li>ルートシグネチャはエンジンと共通の 1 本のままで、ゲームの値はマテリアルの自由な欄（float4 × 4）で渡す</li>
+            <li>描画のシェーダーはエンジンと共通のルートシグネチャのままで、ゲームの値はマテリアルの自由な欄（float4 × 4）で渡す</li>
             <li>標準の光と影の計算を、ゲームのシェーダーから呼べる</li>
-            <li>Debug 構成では、標準とゲームのシェーダーを F5 でまとめて読み直せる</li>
+            <li>Debug と Development 構成では、標準とゲームのシェーダーを F5 でまとめて読み直せる</li>
+            <li>計算シェーダーも、ゲーム側から作成、実行、非同期の読み戻しができる</li>
             <li>見本として、縁を光らせながら物を溶かして戻すディゾルブのシェーダーを作った</li>
           </ul>
           <figure class="figure">
@@ -384,7 +594,8 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
           <h3>glTF の読み込みと裏の読み込み</h3>
           <p>glTF 2.0（.gltf と .bin、.glb）の読み込みを、自作の JSON の読み書きの上に作りました。また、資産を裏のスレッドで読み、読み終えてから場面を切り替えられるようにしました。</p>
           <ul>
-            <li>glTF: ノードの木の行列を頂点に焼き込み、右手系から左手系に直して、材質（基本色、切り抜き、両面、PBR の値とテクスチャ、発光）をマテリアルに写す</li>
+            <li>glTF: 右手系から左手系に直し、材質（基本色、切り抜き、両面、PBR の値とテクスチャ、発光）をマテリアルに写す</li>
+            <li>動かないモデルは行列を頂点に焼き込み、スキン、モーフ、アニメーションのあるモデルはノードを骨にして読む</li>
             <li>.glb や data URI に埋め込まれた画像も読む</li>
             <li>読み込みを、ファイルを読んで解く CPU の段と、D3D12 の資源を作ってコピーする GPU の段に分け、CPU の段をワーカースレッドで行う</li>
             <li>GPU の段は、1 フレームに 4 ms ほどを目安に、メインスレッドでまとめて行う</li>
@@ -402,17 +613,13 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
           </div>
         </div>
 
-        <div class="feature" id="editor">
-          <h3>エディター</h3>
-          <p>Debug 構成では、Dear ImGui を使ったエディターの窓から、場面を見て、その場で直せます。</p>
+        <div class="feature" id="meshreduce">
+          <h3>素材の道具 MeshReduce</h3>
+          <p>写真から作った重いモデルを、ゲームで使える軽い GLB にするコンソールの道具です。</p>
           <ul>
-            <li>Game の窓: 場面を Debug 構成だけの的に描き、その絵を窓の中に出す</li>
-            <li>Scene の窓: 編集用のカメラから見た場面を、同じ光と描き方でもう一度描く</li>
-            <li>階層・インスペクター・資産・プロジェクト・ログの窓</li>
-            <li>再生・停止・一時停止・1 フレーム進める。停止すると、再生を始めたときの場面をコードから作り直す</li>
-            <li>描画の確かめ: 途中の的を並べて見る窓と、材質の値を色で見る表示</li>
-            <li>シェーダーの読み直し: F5 で、すべてのシェーダーをコンパイルでき、C++ の側と食い違わないときだけ入れ替える。古い PSO は GPU が使い終わってから手放す</li>
-            <li>パスごとの GPU のマーカー（RenderDoc でパスの名前が並ぶ）、デバッグレイヤーの文をログに出す仕組み、デバイスが落ちたときの DRED の記録</li>
+            <li>二次誤差（QEM）の辺の縮約で三角形を減らす。UV のずれも誤差に入れる</li>
+            <li>節の変換の焼き込み、向きと実寸の補正、頂点の溶接、テクスチャの統合と縮小</li>
+            <li>複数のモデルの一括処理と、比べる画像の書き出し</li>
           </ul>
         </div>
 
@@ -423,7 +630,7 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>名前付きの入力: キー・マウス・パッドの割り当てから分けて、「跳ぶ」「進む」のような操作の名前で入力を読む</li>
             <li>設定とセーブ: 自作の JSON で、ユーザーのフォルダに書く。一時ファイルに書き切ってから名前を替えるので、途中で止まってもファイルが壊れない</li>
             <li>全画面と DPI: 枠なしの全画面、モニターごとの DPI への対応、VSync の切り替え</li>
-            <li>音: WAV に加えて、MP3・FLAC・M4A・WMA を Media Foundation で読む。MP3 は頭と終わりの無音を切り、つなぎ目なくループする</li>
+            <li>音: WAV に加えて、MP3・FLAC・M4A・WMA を Media Foundation で読む。LAME タグのある MP3 は、頭と終わりの無音を切ってループする</li>
             <li>配布: Release の実行ファイルと要る資産だけを zip にまとめるスクリプト。DLL を使わずに動く</li>
           </ul>
         </div>

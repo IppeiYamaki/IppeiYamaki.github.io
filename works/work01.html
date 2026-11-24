@@ -235,6 +235,36 @@
             <li>親をたどる入れ子。親の回転、倍率、グループの透明度が子に効く</li>
             <li>9 スライス: 角を伸ばさず最大 9 枚に分けて描く。枠の倍率、中央の省略、UV の反転に対応</li>
           </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/ui-anchor-1080.jpg" alt="基準の解像度 1920 × 1080 で置いた UI。体力の帯、地図、字の板、ボタンが画面の角と端に並ぶ" width="1280" height="720" loading="lazy">
+              <figcaption>基準の解像度 1920 × 1080</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/ui-anchor-720.jpg" alt="同じ UI を基準の解像度 1280 × 720 にした場面。部品は大きくなるが、角に付いた板は角に残る" width="1280" height="720" loading="lazy">
+              <figcaption>基準の解像度 1280 × 720。角に付いた板は角に残る</figcaption>
+            </figure>
+          </div>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/ui-nest.jpg" alt="親の板の中に、子の板とボタンが入った入れ子の UI" width="1280" height="720" loading="lazy">
+              <figcaption>入れ子の親の板と、中の子の板とボタン</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/ui-nest-rotate.jpg" alt="親の板を回した場面。子の板とボタンも一緒に傾いている" width="1280" height="720" loading="lazy">
+              <figcaption>親を回すと、子も一緒に回る</figcaption>
+            </figure>
+          </div>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/ui-9slice-small.jpg" alt="9 スライスの枠を小さい倍率で描いた板が並ぶ。角は細く丸い" width="1260" height="709" loading="lazy">
+              <figcaption>9 スライス、枠の倍率が小さいとき</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/ui-9slice-large.jpg" alt="同じ板を大きい倍率で描いた場面。枠が太くなっても角の丸みは伸びない" width="1260" height="709" loading="lazy">
+              <figcaption>枠の倍率が大きいとき。板の大きさが違っても角は伸びない</figcaption>
+            </figure>
+          </div>
         </div>
       </div>
     </section>
@@ -600,6 +630,16 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>LodGroup: 最大 8 段を画面の大きさで選び、ディザで切り替える</li>
             <li>数値は Release、RTX 4060 Laptop、i7-13700H、720p、同じ立方体を並べた場面で測った</li>
           </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/lod-normal.jpg" alt="広い床に、球と輪が数千個並んだ場面を見下ろしたところ" width="1280" height="720" loading="lazy">
+              <figcaption>球と輪を数千個並べた場面</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/lod-colors.jpg" alt="同じ場面を LOD の段で色分けしたところ。手前は緑、奥へ行くほど青になる" width="1280" height="720" loading="lazy">
+              <figcaption>LOD の段の色分け。近い順に赤、緑、青</figcaption>
+            </figure>
+          </div>
         </div>
       </div>
     </section>

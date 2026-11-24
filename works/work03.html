@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>天気の箱庭（仮題） | 山木一平</title>
-  <meta name="description" content="天気で自然を育てる箱庭のシミュレーションゲーム（制作中）。自作の DirectX12 フレームワークの上で、C++ で作っています。">
+  <meta name="description" content="天気で自然を育てる箱庭のシミュレーションゲーム（制作中）。自作の DirectX12 エンジンの上で、C++ で作っています。">
   <link rel="stylesheet" href="../css/style.css?v=20261116-6">
 </head>
 <body>
@@ -30,7 +30,7 @@
           <li>DirectX12</li>
         </ul>
         <div class="video placeholder">動画（仮）</div>
-        <p>天気で自然を育てる、箱庭のシミュレーションゲームです（制作中）。荒れた谷に雨雲や晴れ間を置くと、土の湿り気や温度が変わり、苔から草地、花の草原、森へと植物が移り変わっていきます。人や建物は登場せず、写実寄りの景色を眺めて楽しめる箱庭を目指して、自作の DirectX12 フレームワークの上で作っています。</p>
+        <p>天気で自然を育てる、箱庭のシミュレーションゲームです（制作中）。荒れた谷に天気のカードで雨雲や晴れ間を置くと、土の湿り気や温度が変わり、苔から草地、花の草原、森へと植物が移り変わっていきます。人や建物は登場せず、写実寄りの景色を眺めて楽しめる箱庭を目指して、自作の DirectX12 エンジンの上で作っています。</p>
       </div>
     </section>
 
@@ -40,7 +40,7 @@
         <table class="info-table">
           <tr><th>制作期間</th><td>2025年11月〜</td></tr>
           <tr><th>担当</th><td><span class="keep">企画、</span><span class="keep">プログラム、</span><span class="keep">シェーダー</span></td></tr>
-          <tr><th>開発環境</th><td><span class="keep">C++、</span><span class="keep">HLSL、</span><span class="keep">DirectX12</span><span class="keep">（自作フレームワーク）、</span><span class="keep">Visual Studio 2026</span></td></tr>
+          <tr><th>開発環境</th><td><span class="keep">C++、</span><span class="keep">HLSL、</span><span class="keep">DirectX12</span><span class="keep">（自作エンジン）、</span><span class="keep">Visual Studio 2026</span></td></tr>
         </table>
       </div>
     </section>
@@ -65,17 +65,76 @@
         </div>
 
         <div class="feature">
-          <h3>セルの値から地面を描く<span class="keep">仮のグラフィックス</span></h3>
-          <p>シミュレーションの値を 1 枚の R8 テクスチャ（植物の覆い、湿り気、水深、雪、花、重ね表示の 6 つの帯）にまとめ、地形のピクセルシェーダーで地面の色を作って、フレームワークのライティングで陰影を付けています。テクスチャへの書き込みは、値が変わったときだけ、1 秒に 10 回までにまとめています。</p>
+          <h3>天気のカードとマナ</h3>
+          <p>プレイヤーの手は、6 系統 14 枚の天気のカードです。マナを使ってカードを谷に置くと、雨や日差し、風、火がその範囲のセルの値を変えます。カードごとにマナ、効く範囲、効く日数、次に使えるまでの待ち時間が違います。</p>
           <ul>
-            <li>湿り気・温度・植物の段階・水深・日当たりを地形に色で重ねる表示と凡例</li>
-            <li>花の草原が広がると蝶が飛んでくる（羽ばたきは頂点シェーダーで動かす）</li>
-            <li>雨雲と晴れ間を置く・動かす・消す操作、俯瞰のカメラ、時間の速さの切り替え（停止・×1・×2・×4）</li>
+            <li>雨（小雨、にわか雨、長雨、雷雨）、日（晴れ間、日照り）、霧と露（朝霧、夜露）、風（追い風、種の風）、火（雷、野焼き）、季節（小春日和、寒の戻り）</li>
+            <li>余ったマナでカードを強化できる</li>
+            <li>雲などの天気は、置いた後にドラッグで動かせ、置いてから 4 日の間は取り消せる</li>
+            <li>雨が上がった湿った所に晴れのカードを使うと、虹が出てマナが増える</li>
+          </ul>
+          <figure class="figure medium">
+            <div class="thumb placeholder">画像（仮）</div>
+            <figcaption>カードを選んで谷に天気を置く画面</figcaption>
+          </figure>
+        </div>
+
+        <div class="feature">
+          <h3>段と目標、お題</h3>
+          <p>谷の育て方を、4 つの段で進めます。段ごとに目標があり、新しいカードの系統が開きます。最後の段では天気から手を離し、谷が自分で雨を呼んで 1 年のあいだ緑を保つのを見届けます。</p>
+          <ul>
+            <li>段: 水と緑 → にぎわう谷 → めぐる季節 → 谷にまかせる</li>
+            <li>お題は同時に 2 つ。場所のあるお題は谷の上に輪で示す</li>
+            <li>お題を済ませると、マナが増え、3 枚のカードから 1 枚を選べる</li>
+          </ul>
+        </div>
+
+        <div class="feature">
+          <h3>3 つの視点と季節</h3>
+          <p>谷を俯瞰、低い空、地面の 3 つの視点で眺められます。視点を切り替えるときは、今見ている場所を次のカメラへ引き継いで、なめらかに移ります。</p>
+          <ul>
+            <li>俯瞰: 谷全体を見て天気を置く</li>
+            <li>低い空: 鳥の目の高さで谷の上を飛ぶ</li>
+            <li>地面: 目の高さで地形や水面に沿って歩く</li>
+            <li>季節は 30 日ごとに移り、気温や雪、植物の色が変わる。季節を止めることもできる</li>
+          </ul>
+          <figure class="figure medium">
+            <div class="thumb placeholder">画像（仮）</div>
+            <figcaption>地面の視点から見た谷</figcaption>
+          </figure>
+        </div>
+
+        <div class="feature">
+          <h3>谷のセーブ</h3>
+          <p>谷の全セルの値と遊びの進み具合を JSON で保存し、続きから遊べるようにしました。タイトルへ戻るとき、30 日ごと、ゲームを終えるときに自動で保存します。</p>
+          <ul>
+            <li>前のセーブをバックアップとして残し、読めなかったファイルは消さずに退避する</li>
+            <li>セーブの形式に版を持たせ、古い版は読むときに今の版へ順に変換する</li>
+            <li>今のゲームより新しい版のセーブは、読まず上書きもしない</li>
+          </ul>
+        </div>
+
+        <div class="feature">
+          <h3>セルの値から地面を描く<span class="keep">仮のグラフィックス</span></h3>
+          <p>シミュレーションの値を 1 枚の R8 テクスチャ（植物の覆い、湿り気、水深、雪、植生の種類、重ね表示、灰、火の 8 つの帯）にまとめ、地形のピクセルシェーダーで地面の色を作って、エンジンのライティングで陰影を付けています。テクスチャへの書き込みは、値が変わったときだけ、1 秒に 10 回までにまとめています。</p>
+          <ul>
+            <li>燃えている火、焼け跡、湿地、高山の草、季節の色づきを地形の色で表現</li>
+            <li>湿り気・温度・植物の段階・水深・日当たり・燃えやすさを地形に色で重ねる表示と凡例</li>
+            <li>時間の速さの切り替え（停止・×1・×2・×4）</li>
           </ul>
           <figure class="figure medium">
             <div class="thumb placeholder">画像（仮）</div>
             <figcaption>湿り気を色で重ねた表示</figcaption>
           </figure>
+        </div>
+
+        <div class="feature">
+          <h3>鳥の群れと生き物の声</h3>
+          <p>谷の緑が増えると、遠くの空を鳥の群れが回り、森や草地から声が聞こえるようにしました。どちらも谷の様子から決まります。</p>
+          <ul>
+            <li>鳥の数は緑の割合に応じて増え（最大 24 羽）、冬は半分になる</li>
+            <li>鳥の声は森と低木から、虫の声は草地と花の草原から、3D サウンドで鳴らす（音は仮）</li>
+          </ul>
         </div>
 
         <div class="feature">
@@ -108,7 +167,7 @@
           </figure>
           <figure>
             <div class="thumb placeholder">画像（仮）</div>
-            <figcaption>花の草原に来た蝶</figcaption>
+            <figcaption>花の草原と森が広がった谷</figcaption>
           </figure>
         </div>
 

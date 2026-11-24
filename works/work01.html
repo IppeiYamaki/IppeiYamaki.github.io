@@ -168,6 +168,16 @@
             <li>SpritePass: 画面の UI と文字を描く</li>
             <li>エディターのパス: 線、クリック選択、選んだ物の縁、エディターの窓を描く（Debug と Development 構成）</li>
           </ol>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/targets-depth.jpg" alt="エディターの途中の的の窓で、場面の深度を白黒で表示したもの" width="746" height="454" loading="lazy">
+              <figcaption>途中の的の窓。場面の深度</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/targets-bloom.jpg" alt="同じ窓で、ブルームの段の明るい所だけを表示したもの" width="746" height="454" loading="lazy">
+              <figcaption>同じ窓で見たブルームの段</figcaption>
+            </figure>
+          </div>
         </div>
       </div>
     </section>
@@ -206,6 +216,16 @@
             <li>箱どうしは分離軸（面 6 軸と辺 9 軸）で判定し、Sutherland-Hodgman で切り取って接点を最大 4 点求める</li>
             <li>逐次インパルスとウォームスタートで解き、摩擦と転がり抵抗を入れる</li>
           </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/physics-topple.jpg" alt="坂の上で、箱と円柱と球が倒れ始めた場面" width="1280" height="720" loading="lazy">
+              <figcaption>坂の上で倒れ始める</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/physics-roll.jpg" alt="倒れた円柱と球が、坂を転がり落ちていく場面" width="1280" height="720" loading="lazy">
+              <figcaption>傾いたまま坂を転がり落ちる</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="ui">
@@ -236,6 +256,10 @@
             <li>シェーダーの読み直し: F5 で描画のシェーダーと読み込んだ計算シェーダーをコンパイルし、全部通って C++ の側と食い違わないときだけ入れ替える。古い PSO は GPU が使い終わってから手放す</li>
             <li>パスごとの GPU のマーカー、デバッグレイヤーの文をログに出す仕組み、デバイスが落ちたときの DRED の記録</li>
           </ul>
+          <figure class="figure">
+            <img src="../images/work01/editor.jpg" alt="Game、Scene、階層、プロジェクト、デバッグ、インスペクターの窓を 4 列に並べたエディター。Scene の窓では選んだ輪に縁とギズモが出ている" width="1600" height="841" loading="lazy">
+            <figcaption>4 列の配置のエディター。Scene の窓で選んだ物に縁が付く</figcaption>
+          </figure>
         </div>
 
         <div class="feature" id="picking">
@@ -545,6 +569,16 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>最大 8 層を、画素ごとに上位 4 層まで高さで混ぜる。三平面投影に対応</li>
             <li>折れ線から川の形を彫る（淵と滝を含む）</li>
           </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/terrain-valley.jpg" alt="石の川床が谷を通り、両側の斜面が土と草で塗り分けられた地形" width="1280" height="604" loading="lazy">
+              <figcaption>石の川床と、土と草の層</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/terrain-river.jpg" alt="上から見た谷の地形。川の形に彫られた石の帯と、草地に散らばる茂みと岩" width="1280" height="604" loading="lazy">
+              <figcaption>折れ線から彫った川の形</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="vegetation">

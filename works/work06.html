@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>波のグラティア | 山木一平</title>
+  <meta name="description" content="波を撃ち、念力で曲げて仕掛けを動かす3Dのパズルアクション「波のグラティア」（制作中）のうち、担当した波とギミックのプログラムを紹介します。">
+  <link rel="stylesheet" href="../css/style.css?v=20261116-6">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a class="site-title" href="../">山木一平</a>
+      <nav class="site-nav">
+        <a href="../#works">作品</a>
+        <a href="../#skills">スキル</a>
+        <a href="../#profile">プロフィール</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="work-header">
+      <div class="container">
+        <h1>波のグラティア</h1>
+        <ul class="tags">
+          <li>Unity</li>
+          <li>C#</li>
+        </ul>
+        <div class="video">
+          <img src="../images/work06/header.jpg" alt="海に浮かぶ白い遺跡の中央で、3つのタレットから伸びた青い波が宙に浮かぶクリスタルに集まっている" width="1600" height="900">
+        </div>
+        <p>海に浮かぶ遺跡で、電磁波と超音波の「波」を撃つ3Dのパズルアクションです（制作中）。念力で波を曲げ、エコーロケーションで隠れた物を見つけながら、仕掛けを動かして進みます。HAL東京の未来創造展に向けてチームで作っていて、波の仕組みとギミックのプログラム、ステージの組み立てを担当しています。</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">概要</h2>
+        <table class="info-table">
+          <tr><th>制作期間</th><td>2026年9月〜</td></tr>
+          <tr><th>担当</th><td>波の仕組み（ビーム・扇）と見た目<br>物と波の情報、ギミック、Inspector の拡張<br>α 版と β 版のステージの組み立て</td></tr>
+          <tr><th>開発環境</th><td><span class="keep">Unity 6（URP）、</span><span class="keep">C#、</span><span class="keep">GitHub</span></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">実装した機能</h2>
+
+        <div class="feature">
+          <h3>念力で曲げられる<span class="keep">点と線のビーム</span></h3>
+          <p>ビームは、一定の間隔に並べた点と、点どうしをつなぐ直線で作っています。プレイヤーが念力で点を掴んで動かすと、その点が支点になり、前後の決めた範囲がなめらかに曲がります。曲げる前の基準の線は壁の向こうまで伸ばして考えるので、支点を横へ動かせば、壁を避けて通したり、当たる先を変えたりできます。</p>
+          <ul>
+            <li>曲げ方は 2 つ。支点ごとの山を足し合わせる形（支点を足したり消したりしても形が跳ばない）と、支点で向きを変えてその先は真っすぐ進む形</li>
+            <li>離した支点の曲がりは、手前から来た向きに対する角度で覚えるので、手前の支点を動かすと後ろも鎖のように付いてくる</li>
+            <li>当たった物の素材で、止まる・跳ね返る・通り抜けて先へ進むが決まる</li>
+            <li>種類（電磁波・超音波）・強さ・届く距離・曲げられるかは撃ち手の情報から読み、プレイヤー・タレット・敵で同じ部品を使う</li>
+            <li>当たり判定と見た目を別の部品に分け、見た目は波の種類の色・波長・振幅で揺れる線を流す</li>
+          </ul>
+          <figure class="figure medium">
+            <img src="../images/work06/bend.jpg" alt="タレットから出た青い波が途中で下へ曲がり、ガラスの鉢の中のスイッチに届いている" width="1600" height="900" loading="lazy">
+            <figcaption>タレットの波を念力で曲げて、ガラスの鉢の中のスイッチへ通したところ</figcaption>
+          </figure>
+        </div>
+
+        <div class="feature">
+          <h3>扇（近距離）の波</h3>
+          <p>近くの物に向けて、ショットガンのように広がる波を撃てます。撃った瞬間の位置と向きで円すいの範囲を決め、範囲の中の物へ、波面が届いた順に波を渡します。押している間は 0.12 秒ごとに撃ち、壁の裏には届きません。</p>
+          <ul>
+            <li>見た目は、細かい泡を輪の管に沿って回す泡の輪。輪の広がりは当たり判定の円すいに合わせ、連射すると輪が連なって円すいになる</li>
+            <li>泡の重ね方は、明るい背景でも見える「色を重ねる」と、暗い所で縁が光る「光を足す」から選べる</li>
+          </ul>
+          <figure class="figure medium">
+            <img src="../images/work06/fan.jpg" alt="遺跡の床の上のプレイヤーの前で、扇の波が当たったスイッチが青く光っている" width="1600" height="900" loading="lazy">
+            <figcaption>扇の波を当てて、近くのスイッチを動かしたところ</figcaption>
+          </figure>
+        </div>
+
+        <div class="feature">
+          <h3>物と波の情報</h3>
+          <p>波で動く物、波の跳ね返り方、隠れている物などの情報を、物に付ける小さなコンポーネントに分けて持たせています。情報は持つだけで、動かす処理は波やエコーロケーションの側が読み取って行います。</p>
+          <ul>
+            <li>反応する波の種類と、動くまでに当てる時間（強いビームほど早く溜まる）</li>
+            <li>弱点の部位と、波の種類ごとの効き目の倍率</li>
+            <li>素材（金属・コンクリート・ガラスなど）。波を跳ね返すか・通すか、エコーをさえぎるかを ScriptableObject で決め、直すと同じ素材の物すべてに効く</li>
+            <li>隠れ方（見えない・別の見た目に化けている）と本当の姿</li>
+            <li>当たった物から情報を探した結果は、コライダーごとに覚えて使い回す。コンポーネントの有効・無効が変わったら、次の問い合わせの前にまとめて捨てる</li>
+          </ul>
+        </div>
+
+        <div class="feature">
+          <h3>エコーの範囲の中だけ見える波</h3>
+          <p>ビームの見せ方を「見える範囲の中だけ」にすると、エコーロケーションの波が届いている所だけビームが見えるようにしました。当たり判定と波を渡すことは変わらないので、ふだんは見えない波を、エコーで探しながら解く仕掛けが作れます。「範囲に触れたら全体を見せる」にすると、線の一部が範囲に触れたときにビームの全体を見せ、離れてからも決めた秒数だけ見せ続けます。</p>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work06/echo-before.jpg" alt="遺跡の床の上に白い台が並び、何も見えていない" width="1600" height="900" loading="lazy">
+              <figcaption>エコーを使う前。台の上には何も見えない</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work06/echo-after.jpg" alt="エコーを使うと、台の上に隠れていたタレットと、そこから出る青い波が見えている" width="1600" height="900" loading="lazy">
+              <figcaption>エコーを使うと、隠れていたタレットとその波が見える</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="feature">
+          <h3>ギミック</h3>
+          <p>波が当たったときや、スイッチが入ったときの処理は UnityEvent でつなぎ、プログラムを書かずにシーンの上で仕掛けを組めるようにしました。</p>
+          <ul>
+            <li>上に載った物の重さ（Rigidbody の Mass の合計）で入る床のスイッチ。念力で箱を運んで載せる、などに使う</li>
+            <li>起動すると決めた位置や向きまで動く・回る仕掛け。止めると元に戻り、往復もできる。乗った物を一緒に運ぶ足場にも使う</li>
+            <li>当たった波の数に応じて段階的に光る仕掛け（3 本の波で光りきるクリスタルなど）</li>
+            <li>海に落ちたプレイヤーや箱を、いちばん近い戻す場所へ戻す範囲</li>
+          </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work06/crystal.jpg" alt="宙に浮かぶクリスタルに、3つのタレットから青い波が集まり、強く光っている" width="1600" height="900" loading="lazy">
+              <figcaption>3 本の波が集まって光りきったクリスタル</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work06/stairs.jpg" alt="スイッチに波が届き、海から白い階段がせり上がっている" width="1600" height="900" loading="lazy">
+              <figcaption>スイッチに波を通すと、海から階段がせり上がる</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="feature">
+          <h3>作業を楽にする道具</h3>
+          <p>チームでシーンを組むときに迷わないよう、Unity のエディターを拡張しました。</p>
+          <ul>
+            <li>属性を付けるだけで、Inspector の項目名と選択肢を日本語で出す</li>
+            <li>UnityEvent の関数のメニューに、印を付けた関数だけを出す</li>
+            <li>キーを押すと、シーンにあるすべての波の当たり判定（ビームのカプセル、扇の円すいと波面、当たった所）を半透明で出す</li>
+          </ul>
+        </div>
+
+        <div class="feature">
+          <h3>α 版と β 版のステージ</h3>
+          <p>遺跡のモデルを使って、α 版と β 版のステージを組みました。β 版のステージでは、エコーで隠れた床やスイッチを見つける場所、波を曲げて届かないスイッチに通す場所を回って、中央のクリスタルに 3 本の波を集めると、海に沈んでいた道がせり上がります。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">スクリーンショット</h2>
+        <div class="gallery">
+          <figure>
+            <img class="thumb" src="../images/work06/terrace.jpg" alt="遺跡の門の前に立つプレイヤーと、奥に浮かぶクリスタル" loading="lazy">
+            <figcaption>遺跡の門と、奥に浮かぶクリスタル</figcaption>
+          </figure>
+          <figure>
+            <img class="thumb" src="../images/work06/rising.jpg" alt="タレットの太い波が海の上を通り、飛び石が並んでいる" loading="lazy">
+            <figcaption>タレットの太い波と、海からせり上がってくる飛び石</figcaption>
+          </figure>
+          <figure>
+            <img class="thumb" src="../images/work06/overview.jpg" alt="海に浮かぶ遺跡のステージ全体を上から見下ろしたところ" loading="lazy">
+            <figcaption>β 版のステージの全体</figcaption>
+          </figure>
+        </div>
+
+        <a class="back-link" href="../#works">← 作品一覧に戻る</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      &copy; 2026 山木一平
+    </div>
+  </footer>
+
+  <script src="../js/main.js?v=20261116" defer></script>
+
+</body>
+</html>

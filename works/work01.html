@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DirectX12 エンジン | 山木一平</title>
-  <meta name="description" content="C++20 と DirectX12 で作った自作のゲームエンジンです。エディター、Component のリフレクション、DXR のレイトレーシング、PBR、FBX と VRM のキャラクター、地形と GPU の草木、剛体物理などを作りました。">
+  <meta name="description" content="C++20 と DirectX12 で作った自作のゲームエンジンです。エディター、Component のリフレクション、DXR のレイトレーシング、PBR、FBX と VRM のキャラクター、地形と GPU の草木、大気と水と天気、剛体物理などを作りました。">
   <link rel="stylesheet" href="../css/style.css?v=20261116-6">
 </head>
 <body>
@@ -34,7 +34,7 @@
         <div class="video">
           <img src="../images/work01/classroom.jpg" alt="窓から日の差す教室。机と椅子にブラインドの影が落ち、天井の照明が光り、奥に黒板がある場面" width="1600" height="900">
         </div>
-        <p>C++20 と DirectX12 で作った自作のゲームエンジンです。自作の DirectX11 フレームワークを元に描画の層を Direct3D 12 で作り直し、ゲームを作るためのエディターと Component の仕組み、DXR のレイトレーシング、PBR、FBX と VRM のキャラクター、地形と GPU の草木、剛体物理などを作りました。</p>
+        <p>C++20 と DirectX12 で作った自作のゲームエンジンです。自作の DirectX11 フレームワークを元に描画の層を Direct3D 12 で作り直し、ゲームを作るためのエディターと Component の仕組み、DXR のレイトレーシング、PBR、FBX と VRM のキャラクター、地形と GPU の草木、大気と水と天気、剛体物理などを作りました。</p>
 
         <nav class="toc" aria-label="目次">
           <p class="toc-title">目次</p>
@@ -60,6 +60,7 @@
               <a href="#editing">エディター</a>
               <ol>
                 <li><a href="#editor">エディター</a></li>
+                <li><a href="#scene-file">Scene のファイル、プレハブ、元に戻す</a></li>
                 <li><a href="#picking">Scene の窓のクリック選択</a></li>
               </ol>
             </li>
@@ -87,7 +88,9 @@
                 <li><a href="#mesh-shader">メッシュシェーダーの輪郭線</a></li>
                 <li><a href="#hdr">線形の色と HDR</a></li>
                 <li><a href="#pbr">PBR と法線マップ</a></li>
-                <li><a href="#ibl">空から作る環境の光（IBL）</a></li>
+                <li><a href="#ibl">大気の空と、空から作る環境の光（IBL）</a></li>
+                <li><a href="#many-lights">たくさんの光（光のクラスター）</a></li>
+                <li><a href="#gpu-particles">GPU の粒と体積の火</a></li>
                 <li><a href="#msaa">MSAA と自作の解決</a></li>
                 <li><a href="#from-dx11">DirectX11 版から移した描画</a></li>
               </ol>
@@ -98,6 +101,15 @@
                 <li><a href="#terrain">地形</a></li>
                 <li><a href="#vegetation">GPU の草木</a></li>
                 <li><a href="#culling">視錐台カリング・自動インスタンス化・LOD</a></li>
+              </ol>
+            </li>
+            <li>
+              <a href="#nature">水と天気</a>
+              <ol>
+                <li><a href="#water">水面と滝</a></li>
+                <li><a href="#wetness">濡れて乾く面</a></li>
+                <li><a href="#weather">雨、雪、霧、雷</a></li>
+                <li><a href="#rocks">手続きの岩</a></li>
               </ol>
             </li>
             <li>
@@ -147,6 +159,8 @@
             <li>Debug: 最適化なし。エディター、アサート、D3D12 のデバッグレイヤーが入る</li>
             <li>Development: 最適化を掛けたまま、エディターとアサートを使える。デバッグレイヤーは要るときだけ入れる</li>
             <li>Release: エディターとアサートを外し、リンク時の最適化を掛ける配布用の構成</li>
+            <li>Debug と Development では、エンジンを Engine.dll、ゲームのコードを Game.dll に分け、exe が読む。Release は静的にリンクした 1 つの exe にする</li>
+            <li>Engine.dll が外に出す関数の一覧（.def）は、自作の Python の道具で作る</li>
           </ul>
         </div>
 
@@ -157,13 +171,18 @@
             <li>計算のキュー: 骨で動くモデルの位置を計算シェーダーで出し、BLAS と TLAS を作る（レイの影か AO を使うときだけ）</li>
             <li>ShadowPass: カスケードシャドウマップを描く</li>
             <li>SceneTargetPass: 16 ビットの浮動小数で MSAA の場面のレンダーターゲットに切り替える</li>
+            <li>WetnessFlowPass: 濡れた面を伝う水の流れを、計算シェーダーで進める</li>
             <li>OpaquePass: 不透明の物を描く</li>
+            <li>HiZPass: 不透明の物の深度から、深度の山（Hi-Z）を作る</li>
             <li>VegetationPass: 計算シェーダーで選んだ草木を描く</li>
-            <li>SkyPass: 何も描かれていない画素に空を描く</li>
+            <li>SkyPass: 何も描かれていない画素に、大気の表から空を描く</li>
             <li>OutlinePass: 輪郭線を描く</li>
+            <li>AtmospherePass: 場面に霞を掛ける</li>
+            <li>WaterPass: 水面を描く</li>
             <li>TransparentPass: 半透明の物を、カメラから遠い順に描く</li>
             <li>ParticlePass: 粒を描く</li>
             <li>AmbientOcclusionPass: DXR で AO を求めて、場面の色に掛ける（使うカメラだけ）</li>
+            <li>FireVolumePass、WeatherParticlePass、WaterfallParticlePass、GpuParticlePass: 体積の火、雨と雪、滝のしぶき、GPU の粒を描く</li>
             <li>PostEffectPass: MSAA を 1 サンプルに解決し、ブルーム、露出とトーンマップ、ディザ、FXAA を掛け、sRGB に直して画面に出す</li>
             <li>SpritePass: 画面の UI と文字を描く</li>
             <li>エディターのパス: 線、クリック選択、選んだ物の縁、エディターの窓を描く（Debug と Development 構成）</li>
@@ -188,7 +207,7 @@
 
         <div class="feature" id="component">
           <h3>Scene・GameObject・Component</h3>
-          <p>コードで GameObject を作って Component を付け、場面を組み立てます。DirectX11 版の形を引き継ぎ、物の多い場面でも速く回るように作り直しました。</p>
+          <p>GameObject に Component を付けて場面を組み立てます。場面はコードからも、Scene のファイルからも作れます。DirectX11 版の形を引き継ぎ、物の多い場面でも速く回るように作り直しました。</p>
           <ul>
             <li>Component は OnStart、FixedUpdate、Update、LateUpdate などを持つ</li>
             <li>コールバックを持つかどうかをコンパイル時に判定し、要らない呼び出しを省く</li>
@@ -198,11 +217,11 @@
 
         <div class="feature" id="reflection">
           <h3>Component のリフレクション</h3>
-          <p>C++ には実行時に型の中身を見る仕組みが無いので、Component の欄を表にして登録する仕組みを作りました。1 つの表から、インスペクターの表示と「コードとしてコピー」を作ります。</p>
+          <p>C++ には実行時に型の中身を見る仕組みが無いので、Component の欄を表にして登録する仕組みを作りました。1 つの表から、インスペクターの表示、「コードとしてコピー」、Scene とプレハブのファイルの保存と読み込みを作ります。</p>
           <ul>
             <li>.cpp に登録のマクロを 1 行書くと、起動時に型が登録される</li>
             <li>欄はセッター経由、ラムダ、メンバの直接のどれでも書ける</li>
-            <li>値の型: bool、整数、float、Vector2〜4、Quaternion、enum、文字列、構造体、optional、vector</li>
+            <li>値の型: bool、整数、float、Vector2〜4、Quaternion、enum、文字列、構造体、optional、vector、資産の参照、物の参照</li>
             <li>エンジンの Component とゲームの Component を同じ形で登録する</li>
           </ul>
         </div>
@@ -280,8 +299,9 @@
             <li>Game の窓: 場面を専用のレンダーターゲットに描き、その絵を窓の中に出す</li>
             <li>Scene の窓: 編集用のカメラから見た場面を、同じ光と描き方でもう一度描く</li>
             <li>階層、インスペクター、資産、プロジェクト、ログ、レンダーターゲットの窓</li>
-            <li>窓の配置: 既定の形と 4 列の形を切り替える。4 列では Game と Scene の窓が両方 16:9 になる幅を計算する</li>
-            <li>再生、停止、一時停止、1 フレーム送り。停止すると、再生を始めたときの場面をコードから作り直す</li>
+            <li>分析と設定の窓: プロファイラー、入力の様子、光、濡れ、VRAM、フレームの流れ、プロジェクトの設定（入力、音、時間、画面、品質）</li>
+            <li>窓の配置: 4 列（既定）、従来、縦長、横長の 4 種から選ぶ。4 列では Game と Scene の窓が両方 16:9 になる幅を計算する</li>
+            <li>再生、停止、一時停止、1 フレーム送り。停止すると、再生を始めたときの場面に戻す</li>
             <li>描画の確かめ: 描画の途中のレンダーターゲット（影、深度、AO、ブルームなど）を切り替えて見る窓と、材質の値を色で見る表示</li>
             <li>シェーダーの読み直し: F5 で描画のシェーダーと読み込んだ計算シェーダーをコンパイルし、全部通って C++ の側と食い違わないときだけ入れ替える。古い PSO は GPU が使い終わってから手放す</li>
             <li>パスごとの GPU のマーカー、デバッグレイヤーの文をログに出す仕組み、デバイスが落ちたときの DRED の記録</li>
@@ -290,6 +310,19 @@
             <img src="../images/work01/editor.jpg" alt="Game、Scene、階層、プロジェクト、デバッグ、インスペクターの窓を 4 列に並べたエディター。Scene の窓では選んだ輪に縁とギズモが出ている" width="1600" height="841" loading="lazy">
             <figcaption>4 列の配置のエディター。Scene の窓で選んだ物に縁が付く</figcaption>
           </figure>
+        </div>
+
+        <div class="feature" id="scene-file">
+          <h3>Scene のファイル、プレハブ、元に戻す</h3>
+          <p>エディターで組んだ場面を JSON のファイルに保存して読み、組んだ物をプレハブにして何度も置けるようにしました。編集の操作は元に戻せます。</p>
+          <ul>
+            <li>物ごとに 64 ビットの ID を持ち、Component の値はリフレクションの表で書く</li>
+            <li>登録の無い型の Component は、元の JSON のまま残し、次の保存で消さない</li>
+            <li>新規、開く、保存（Ctrl+S）、最近の Scene。再生を止めると、再生を始めたときのファイルの写しから作り直す</li>
+            <li>プレハブ: 置いた物の差分は欄 1 つ単位で残す。プロジェクトの窓から引っ張って置ける。Material もファイルに書ける</li>
+            <li>物を作る、消す、複製、名前替え、写して貼る、親と並びの替え、Component の追加と削除と並べ替え。階層で複数選べる</li>
+            <li>Ctrl+Z と Ctrl+Y で、100 回まで戻してやり直せる</li>
+          </ul>
         </div>
 
         <div class="feature" id="picking">
@@ -325,7 +358,7 @@
             <li>人型の骨の対応、表情、揺れもの、材質の値を読む</li>
             <li>表情はモーフのグループにして動かす</li>
             <li>髪やスカートの揺れは、自作の SpringBone（惰性、硬さ、重力、骨の長さ、球の当たり）で計算する</li>
-            <li>MToon の値を、エンジンの Toon シェーダーの値へ変換して描く</li>
+            <li>MToon の値のまま、MToon 用のシェーダーで描く（レイトレーシングの影の版もある）</li>
           </ul>
         </div>
 
@@ -354,8 +387,8 @@
             <li>定数や頂点のような毎フレームの小さなデータは、アップロード用のリングバッファから切り出す</li>
             <li>GPU が使っているかもしれない資源は、フェンスの値と一緒に遅延解放の列に入れ、使い終わってから手放す</li>
             <li>資源の状態を覚えておき、要る遷移のバリアをまとめて出す</li>
-            <li>PSO は、シェーダー、描く先の形式、MSAA のサンプル数などを鍵にしてキャッシュする</li>
-            <li>テクスチャは読み込むときに CPU でミップを作り、既定のヒープへコピーしてから使う</li>
+            <li>PSO は、シェーダー、描く先の形式、MSAA のサンプル数などを鍵にしてキャッシュする。作った PSO は ID3D12PipelineLibrary でディスクに残し、よく使う物は裏で先に作る</li>
+            <li>テクスチャは読み込むときに CPU でミップを作り、既定のヒープへコピーしてから使う。変換した結果はディスクの置き場（4 GiB まで）に残し、次からはそこから読む</li>
           </ul>
         </div>
 
@@ -363,7 +396,7 @@
           <h3>Bindless</h3>
           <p>テクスチャごとにディスクリプタテーブルを切り替えず、シェーダーが番号でディスクリプタヒープから直接テクスチャを引く形（シェーダーモデル 6.6 の Bindless）にしました。描画のルートシグネチャはエンジン全体で 1 本です。</p>
           <ul>
-            <li>描く物ごとのテクスチャの番号は、ルート定数（14 個）で渡す</li>
+            <li>描く物ごとのテクスチャの番号は、ルート定数（15 個）で渡す</li>
             <li>シェーダーは DXC でシェーダーモデル 6.6 にコンパイルする</li>
             <li>起動するときに、GPU がシェーダーモデル 6.6 と Resource Binding Tier 3 に対応しているかを確かめる</li>
             <li>レイトレーシングの TLAS や、切り抜きの判定で読む頂点とインデックスのバッファも、同じヒープから番号で引く</li>
@@ -375,7 +408,7 @@ cbuffer TextureIndexBuffer : register(b9)
     uint g_toonTextureIndex;
     uint g_sphereTextureIndex;
     uint g_normalTextureIndex;
-    // ……（全部で 14 個）
+    // ……（全部で 15 個）
 };
 
 // シェーダーから見えるディスクリプタヒープから、番号で直接引く
@@ -499,6 +532,7 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>色のテクスチャは sRGB の形式で読み、法線マップなどのデータのテクスチャはそのまま読む</li>
             <li>トーンマップの曲線を、切るだけ・肩・S 字の 3 つから選べる</li>
             <li>1 を超える明るさを残したまま、ブルームや AO を掛けられる</li>
+            <li>自動の露出: 場面の明るさを計算シェーダーで測り、露出をゆっくり合わせる（カメラごとに選ぶ）</li>
           </ul>
           <figure class="figure">
             <img src="../images/work01/hdr.jpg" alt="砂の地面に、光る 3 つの球と白く明るい板、黒い金属の球を置き、球の周りがにじんでいる場面" width="1280" height="720" loading="lazy">
@@ -538,12 +572,34 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
         </div>
 
         <div class="feature" id="ibl">
-          <h3>空から作る環境の光（IBL）</h3>
-          <p>空の式を計算シェーダーで評価して、環境の光を実行時に作ります。</p>
+          <h3>大気の空と、空から作る環境の光（IBL）</h3>
+          <p>空、霞、雲を、前もって作った大気の表から描きます。同じ表から、環境の光を実行時に作ります。</p>
           <ul>
-            <li>鏡面: GGX の重点サンプリングで、粗さごとのミップを持つ 64×64 のキューブマップを作る</li>
-            <li>拡散: 球面調和の 9 係数を求める</li>
-            <li>毎フレーム作り直しても、RTX 4060 Laptop で約 0.06 ms（Release、720p）</li>
+            <li>大気: 透過、多重散乱、空の見え方、霞の 3D の表を計算シェーダーで作る</li>
+            <li>霞は場面の深度に合わせて掛ける。雲は高さ 1 枚の層で、地面に雲の影を落とす。夜は星と月を描く</li>
+            <li>環境の光の鏡面: GGX の重点サンプリングで、粗さごとのミップを持つ 64×64 のキューブマップを作る</li>
+            <li>環境の光の拡散: 球面調和の 9 係数を求める</li>
+            <li>環境の光は、空が変わったときだけ作り直す</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="many-lights">
+          <h3>たくさんの光（光のクラスター）</h3>
+          <p>点光源とスポットの数の上限（16 個）を外し、1 つの視点で 4,096 個まで使えるようにしました。</p>
+          <ul>
+            <li>視錐台を 24 × 14 × 24 の箱に分け、箱ごとに届く光だけを絞る</li>
+            <li>画素は自分の箱の光だけを計算する</li>
+            <li>光の数、届く範囲、動きを変えて試す見本の Component を作った</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="gpu-particles">
+          <h3>GPU の粒と体積の火</h3>
+          <p>粒を GPU で進めて描く土台を作り、その上に雨、雪、しぶき、火の粉を乗せました。火は 3D の流体として GPU で解きます。</p>
+          <ul>
+            <li>GPU の粒: 計算シェーダーで生まれる、動く、深度に当たる、消えるを進め、そのまま描く</li>
+            <li>体積の火: 64 × 96 × 64 マスの流体を計算シェーダーで解き、半分の解像度のレイマーチで、温度に合わせた色と煙を描く</li>
+            <li>火の熱を読み戻して、周りを照らす光の強さに使う。火の粉は GPU の粒で出す</li>
           </ul>
         </div>
 
@@ -618,6 +674,8 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>同じ入力なら同じ配置になる</li>
             <li>計算シェーダーで 1 本ずつ視錐台と距離で選び、LOD を決める</li>
             <li>描く数も GPU が書き、ExecuteIndirect で描く。CPU は見える数を読み戻さない</li>
+            <li>Hi-Z の遮蔽カリング: 不透明の物の深度から深度の山を作り、手前の物に隠れた草木を外す</li>
+            <li>流れるノイズの風で低木と木を揺らし、影も一緒に揺れる。草木も影を落とす</li>
           </ul>
           <div class="compare">
             <figure class="figure">
@@ -638,6 +696,7 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>視錐台カリング: 球で判定し、視点と影の段ごとに行う。影を落とす 20,000 個で、影の記録が 21.19 ms から 1.12 ms に減った</li>
             <li>自動インスタンス化: 同じメッシュと Material の物をまとめて描く。7,000 個で、不透明の記録が 0.92 ms から 0.05 ms に減った</li>
             <li>LodGroup: 最大 8 段を画面の大きさで選び、ディザで切り替える</li>
+            <li>LOD の段の自動の作成: インスペクターで減らす割合を選ぶと、裏のスレッドでメッシュを減らして段を作り、結果をディスクに残す</li>
             <li>数値は Release、RTX 4060 Laptop、i7-13700H、720p、同じ立方体を並べた場面で測った</li>
           </ul>
           <div class="compare">
@@ -650,6 +709,51 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
               <figcaption>LOD の段の色分け。近い順に赤、緑、青</figcaption>
             </figure>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="nature">
+      <div class="container">
+        <h2 class="section-title">水と天気</h2>
+
+        <div class="feature" id="water">
+          <h3>水面と滝</h3>
+          <p>池や川の水面を、高さ、深さ、流れ、泡を持つ水の場から描きます。</p>
+          <ul>
+            <li>描いた場面の色を写し取り、屈折と水際の色に使う</li>
+            <li>滝の水の幕と、滝つぼのしぶきと霧を描く</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="wetness">
+          <h3>濡れて乾く面</h3>
+          <p>物と地形が、雨や水に触れると濡れ、時間がたつと乾きます。濡れた面は暗くなり、つやが出ます。</p>
+          <ul>
+            <li>濡らす元: 雨、置いた箱の範囲、水面</li>
+            <li>頂点ごとの水の流れを計算シェーダーで進め、面を伝う筋と水滴を描く。下の縁からは滴が落ちる</li>
+            <li>地形の層にも、濡れと雪の白さが付く</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="weather">
+          <h3>雨、雪、霧、雷</h3>
+          <p>天気の見た目を、GPU の粒と霧と光で作りました。</p>
+          <ul>
+            <li>雨と雪は GPU の粒で降らせ、雨雲の下だけに降らせることもできる</li>
+            <li>高さで濃くなる霧と、場所に置く霧の箱</li>
+            <li>雷: 場面が光り、稲妻の帯を描く</li>
+            <li>火の明かりと火の粉を置く Component</li>
+          </ul>
+        </div>
+
+        <div class="feature" id="rocks">
+          <h3>手続きの岩</h3>
+          <p>岩の形を、正二十面体にノイズと切り口を加えて作ります。</p>
+          <ul>
+            <li>3 段の LOD を一緒に作る</li>
+            <li>岩肌の Material に、三平面の貼り方、上を向いた面の苔、水面より下の濡れを付けられる</li>
+          </ul>
         </div>
       </div>
     </section>
@@ -716,6 +820,7 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>全画面と DPI: 枠なしの全画面、モニターごとの DPI への対応、VSync の切り替え</li>
             <li>音: WAV に加えて、MP3・FLAC・M4A・WMA を Media Foundation で読む。LAME タグのある MP3 は、頭と終わりの無音を切ってループする</li>
             <li>配布: Release の実行ファイルと要る資産だけを zip にまとめるスクリプト。DLL を使わずに動く</li>
+            <li>回帰テスト: 決まった場面を固定の時間の刻みで走らせ、フレームごとの時間と結果をファイルに書き出す</li>
           </ul>
         </div>
 

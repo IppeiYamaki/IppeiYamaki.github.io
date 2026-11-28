@@ -581,6 +581,16 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>環境の光の拡散: 球面調和の 9 係数を求める</li>
             <li>環境の光は、空が変わったときだけ作り直す</li>
           </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/sky-day.jpg" alt="昼の青空の下、草原に桜の木が立ち、奥の山が霞んで見える場面" width="1280" height="720" loading="lazy">
+              <figcaption>昼。遠くの山ほど霞む</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/sky-dusk.jpg" alt="同じ場面の夕方。空が暗い青になって星が出始め、山の頂が赤く照らされている" width="1280" height="720" loading="lazy">
+              <figcaption>同じカメラの夕方。空が暗くなり、星が出る</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="many-lights">
@@ -601,6 +611,16 @@ return query.CommittedStatus() == COMMITTED_TRIANGLE_HIT ? 0.0f : 1.0f; // 当�
             <li>体積の火: 64 × 96 × 64 マスの流体を計算シェーダーで解き、半分の解像度のレイマーチで、温度に合わせた色と煙を描く</li>
             <li>火の熱を読み戻して、周りを照らす光の強さに使う。火の粉は GPU の粒で出す</li>
           </ul>
+          <div class="compare">
+            <figure class="figure">
+              <img src="../images/work01/fire-volume.jpg" alt="夜の桜の下で、石に囲まれた薪から炎と煙が立ち上り、火の粉が舞うたき火" width="1280" height="720" loading="lazy">
+              <figcaption>体積の火のたき火。炎、煙、火の粉</figcaption>
+            </figure>
+            <figure class="figure">
+              <img src="../images/work01/sakura-night.jpg" alt="夜に桜の木を下から見上げた場面。枝と花が、たき火の明かりで橙色に照らされている" width="1280" height="720" loading="lazy">
+              <figcaption>たき火の明かりに照らされた桜を見上げたところ</figcaption>
+            </figure>
+          </div>
         </div>
 
         <div class="feature" id="msaa">
